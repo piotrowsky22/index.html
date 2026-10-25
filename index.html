@@ -92,7 +92,10 @@
                     </span>
                 </div>
             </div>
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-2">
+                <button onclick="updateApp()" class="text-gray-400 hover:text-emerald-400 p-1.5 bg-gray-800 border border-gray-700 rounded-lg text-xs" title="Odśwież dane">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                </button>
                 <input type="month" id="currentMonth" class="bg-gray-800 text-xs border border-gray-700 rounded-lg px-2 py-1 focus:outline-none focus:border-emerald-500 text-white">
             </div>
         </div>
@@ -195,7 +198,6 @@
 
         <!-- WIDOK: HARMONOGRAM SPŁAT I OPŁAT -->
         <div id="tab-schedule" class="space-y-4 hidden">
-            <!-- Powiadomienia Push i Ustawienie czasu przypomnienia -->
             <div class="bg-indigo-950/50 border border-indigo-500/30 p-4 rounded-2xl shadow space-y-3">
                 <div id="notifBanner" class="flex justify-between items-center border-b border-indigo-500/20 pb-3">
                     <div class="flex items-center gap-3">
@@ -334,6 +336,7 @@
 
     </main>
 
+    <!-- MODALE -->
     <!-- MODAL: Harmonogram Spłat -->
     <div id="scheduleModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -343,57 +346,56 @@
             </div>
 
             <form id="scheduleForm" onsubmit="saveScheduleItem(event)" class="space-y-3">
-                <!-- Szybkie szablony -->
                 <div>
                     <label class="text-[11px] text-gray-400 block mb-1">Szybki szablon płatności:</label>
                     <div class="flex gap-1.5 overflow-x-auto pb-1">
                         <button type="button" onclick="applyTemplate('czynsz')" class="bg-gray-800 hover:bg-gray-700 text-gray-300 text-[10px] px-2.5 py-1 rounded-lg border border-gray-700 whitespace-nowrap">🏠 Czynsz</button>
-                        <button type="button" onclick="applyTemplate('prad')" class="bg-gray-800 hover:bg-gray-700 text-gray-300 text-[10px] px-2.5 py-1 rounded-lg border border-gray-700 whitespace-nowrap">⚡ Prąd (PGE/Enea)</button>
-                        <button type="button" onclick="applyTemplate('rata')" class="bg-gray-800 hover:bg-gray-700 text-gray-300 text-[10px] px-2.5 py-1 rounded-lg border border-gray-700 whitespace-nowrap">📺 Rata TV / RTV</button>
+                        <button type="button" onclick="applyTemplate('prad')" class="bg-gray-800 hover:bg-gray-700 text-gray-300 text-[10px] px-2.5 py-1 rounded-lg border border-gray-700 whitespace-nowrap">⚡ Prąd</button>
+                        <button type="button" onclick="applyTemplate('rata')" class="bg-gray-800 hover:bg-gray-700 text-gray-300 text-[10px] px-2.5 py-1 rounded-lg border border-gray-700 whitespace-nowrap">📺 Rata TV</button>
                         <button type="button" onclick="applyTemplate('internet')" class="bg-gray-800 hover:bg-gray-700 text-gray-300 text-[10px] px-2.5 py-1 rounded-lg border border-gray-700 whitespace-nowrap">🌐 Internet</button>
                     </div>
                 </div>
 
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Nazwa płatności / Rachunku</label>
-                    <input type="text" id="schTitle" required placeholder="np. Czynsz, Rata TV, Prąd" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 text-white">
+                    <input type="text" id="schTitle" required placeholder="np. Czynsz, Rata TV" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">Kwota (zł)</label>
-                        <input type="number" step="0.01" id="schAmount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 text-white">
+                        <input type="number" step="0.01" id="schAmount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
                     </div>
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">Termin płatności</label>
-                        <input type="date" id="schDueDate" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500 text-white">
+                        <input type="date" id="schDueDate" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none text-white">
                     </div>
                 </div>
 
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Sposób zapłaty</label>
-                    <select id="schMethod" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-indigo-500 text-white">
-                        <option value="Przelew bankowy">Przelew bankowy (z podaniem IBAN)</option>
-                        <option value="Aplikacja banku">Aplikacja banku (Spłata w appce / Raty)</option>
-                        <option value="BLIK">BLIK / Szybki przelew</option>
+                    <select id="schMethod" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs focus:outline-none text-white">
+                        <option value="Przelew bankowy">Przelew bankowy</option>
+                        <option value="Aplikacja banku">Aplikacja banku</option>
+                        <option value="BLIK">BLIK</option>
                         <option value="Karta / Płatność automatyczna">Karta / Płatność automatyczna</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="text-xs text-gray-400 block mb-1">Numer konta / IBAN (opcjonalnie do kopiowania)</label>
-                    <input type="text" id="schIban" placeholder="00 0000 0000 0000 0000 0000 0000" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-indigo-500 text-white">
+                    <label class="text-xs text-gray-400 block mb-1">Numer konta / IBAN (opcjonalnie)</label>
+                    <input type="text" id="schIban" placeholder="00 0000 0000 0000 0000 0000 0000" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs focus:outline-none text-white">
                 </div>
 
                 <div>
-                    <label class="text-xs text-gray-400 block mb-1">Odbiorca / Uwagi / Tytuł przelewu</label>
-                    <input type="text" id="schRecipient" placeholder="np. Spółdzielnia, Santander, Przelew za TV" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-indigo-500 text-white">
+                    <label class="text-xs text-gray-400 block mb-1">Odbiorca / Uwagi</label>
+                    <input type="text" id="schRecipient" placeholder="np. Spółdzielnia" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs focus:outline-none text-white">
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">Z jakiego konta?</label>
-                        <select id="schAccount" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-indigo-500 text-white">
+                        <select id="schAccount" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs focus:outline-none text-white">
                             <option value="Wspólne">Konto Wspólne</option>
                             <option value="Szymon">Szymon</option>
                             <option value="Aga">Aga</option>
@@ -401,7 +403,7 @@
                     </div>
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">Powtarzalność</label>
-                        <select id="schRepeat" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-indigo-500 text-white">
+                        <select id="schRepeat" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs focus:outline-none text-white">
                             <option value="Co miesiąc">Co miesiąc</option>
                             <option value="Jednorazowo">Jednorazowo</option>
                         </select>
@@ -413,7 +415,7 @@
         </div>
     </div>
 
-    <!-- MODAL: Nowa Transakcja / Edycja -->
+    <!-- MODAL: Transakcja -->
     <div id="transactionModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
@@ -435,7 +437,7 @@
 
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Za kogo jest ten wydatek? (Dług)</label>
-                    <select id="debtType" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-amber-500 text-amber-300">
+                    <select id="debtType" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs focus:outline-none text-amber-300">
                         <option value="NONE">Za siebie (Zwykły wydatek)</option>
                         <option value="SZYMON_FOR_AGA">Szymon płacił ZA AGĘ (Aga wisi Szymonowi)</option>
                         <option value="AGA_FOR_SZYMON">Aga płaciła ZA SZYMONA (Szymon wisi Adze)</option>
@@ -453,23 +455,23 @@
                     </div>
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">Data transakcji</label>
-                        <input type="date" id="txDate" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none focus:border-emerald-500 text-white">
+                        <input type="date" id="txDate" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none text-white">
                     </div>
                 </div>
 
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Nazwa</label>
-                    <input type="text" id="title" required placeholder="np. Biedronka, Netflix, Paliwo" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                    <input type="text" id="title" required placeholder="np. Biedronka, Paliwo" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
                 </div>
 
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Kwota (zł)</label>
-                    <input type="number" step="0.01" id="amount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                    <input type="number" step="0.01" id="amount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
                 </div>
 
                 <div id="categoryContainer">
                     <label class="text-xs text-gray-400 block mb-1">Kategoria</label>
-                    <select id="category" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                    <select id="category" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
                         <option value="Jedzenie">Jedzenie i Zakupy</option>
                         <option value="Mieszkanie">Mieszkanie / Rachunki</option>
                         <option value="Subskrypcje">Subskrypcje / Rozrywka</option>
@@ -486,7 +488,7 @@
         </div>
     </div>
 
-    <!-- MODAL: Przelew na Konto Wspólne -->
+    <!-- MODAL: Przelew -->
     <div id="transferModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
@@ -496,21 +498,21 @@
 
             <form id="transferForm" onsubmit="registerSharedTransfer(event)" class="space-y-3">
                 <div>
-                    <label class="text-xs text-gray-400 block mb-1">Nadawca (Z jakiego konta?)</label>
-                    <select id="transferFrom" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-violet-500 text-white">
+                    <label class="text-xs text-gray-400 block mb-1">Nadawca</label>
+                    <select id="transferFrom" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs focus:outline-none text-white">
                         <option value="Szymon">Szymon ➔ Konto Wspólne</option>
                         <option value="Aga">Aga ➔ Konto Wspólne</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="text-xs text-gray-400 block mb-1">Kwota przelewu (zł)</label>
-                    <input type="number" step="0.01" id="transferAmount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-violet-500 text-white">
+                    <label class="text-xs text-gray-400 block mb-1">Kwota (zł)</label>
+                    <input type="number" step="0.01" id="transferAmount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
                 </div>
 
                 <div>
-                    <label class="text-xs text-gray-400 block mb-1">Tytuł przelewu / opis</label>
-                    <input type="text" id="transferTitle" required value="Zasilenie konta wspólnego" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-violet-500 text-white">
+                    <label class="text-xs text-gray-400 block mb-1">Tytuł przelewu</label>
+                    <input type="text" id="transferTitle" required value="Zasilenie konta wspólnego" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
                 </div>
 
                 <button type="submit" class="w-full bg-violet-600 hover:bg-violet-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow-lg shadow-violet-900/20">Wykonaj przelew</button>
@@ -518,7 +520,7 @@
         </div>
     </div>
 
-    <!-- MODAL: Wpisz Spłatę Długu -->
+    <!-- MODAL: Spłata Długu -->
     <div id="payDebtModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
@@ -528,21 +530,21 @@
 
             <form id="payDebtForm" onsubmit="registerDebtPayment(event)" class="space-y-3">
                 <div>
-                    <label class="text-xs text-gray-400 block mb-1">Kierunek przelewu / spłaty</label>
-                    <select id="payDirection" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500 text-white">
+                    <label class="text-xs text-gray-400 block mb-1">Kierunek spłaty</label>
+                    <select id="payDirection" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs focus:outline-none text-white">
                         <option value="AGA_PAYS_SZYMON">Aga oddaje pieniądze Szymonowi (Aga ➔ Szymon)</option>
                         <option value="SZYMON_PAYS_AGA">Szymon oddaje pieniądze Adze (Szymon ➔ Aga)</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="text-xs text-gray-400 block mb-1">Kwota spłaty (zł)</label>
-                    <input type="number" step="0.01" id="payAmount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                    <label class="text-xs text-gray-400 block mb-1">Kwota (zł)</label>
+                    <input type="number" step="0.01" id="payAmount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
                 </div>
 
                 <div>
-                    <label class="text-xs text-gray-400 block mb-1">Opis spłaty</label>
-                    <input type="text" id="payTitle" required value="Spłata długu / Rozliczenie" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                    <label class="text-xs text-gray-400 block mb-1">Opis</label>
+                    <input type="text" id="payTitle" required value="Spłata długu / Rozliczenie" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
                 </div>
 
                 <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow-lg shadow-emerald-900/20">Zarejestruj spłatę</button>
@@ -550,28 +552,28 @@
         </div>
     </div>
 
-    <!-- MODAL: Nowa Subskrypcja -->
+    <!-- MODAL: Subskrypcja -->
     <div id="subModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-                <h3 class="font-bold text-base">Nowa subskrypcja / stała opłata</h3>
+                <h3 class="font-bold text-base">Nowa subskrypcja</h3>
                 <button onclick="closeSubModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
             <form id="subForm" onsubmit="addSubscription(event)" class="space-y-3">
                 <div>
-                    <label class="text-xs text-gray-400 block mb-1">Nazwa (np. Netflix, Spotify, Gym)</label>
-                    <input type="text" id="subName" required placeholder="Netflix" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-sky-500 text-white">
+                    <label class="text-xs text-gray-400 block mb-1">Nazwa</label>
+                    <input type="text" id="subName" required placeholder="Netflix" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">Kwota miesięczna (zł)</label>
-                        <input type="number" step="0.01" id="subAmount" required placeholder="43.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-sky-500 text-white">
+                        <input type="number" step="0.01" id="subAmount" required placeholder="43.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
                     </div>
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">Konto</label>
-                        <select id="subAccount" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-sky-500 text-white">
+                        <select id="subAccount" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
                             <option value="Szymon">Szymon</option>
                             <option value="Aga">Aga</option>
                             <option value="Wspólne">Wspólne</option>
@@ -584,7 +586,7 @@
         </div>
     </div>
 
-    <!-- MODAL: Planowanie limitu -->
+    <!-- MODAL: Planner -->
     <div id="plannerModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
@@ -595,7 +597,7 @@
             <form id="plannerForm" onsubmit="saveBudgetPlan(event)" class="space-y-3">
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Kategoria</label>
-                    <select id="planCategory" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                    <select id="planCategory" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
                         <option value="Jedzenie">Jedzenie i Zakupy</option>
                         <option value="Mieszkanie">Mieszkanie / Rachunki</option>
                         <option value="Auto">Auto / Transport</option>
@@ -607,7 +609,7 @@
 
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Maksymalny planowany limit (zł)</label>
-                    <input type="number" step="0.01" id="planLimit" required placeholder="1500.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                    <input type="number" step="0.01" id="planLimit" required placeholder="1500.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
                 </div>
 
                 <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow-lg shadow-emerald-900/20">Zapisz limit</button>
@@ -615,7 +617,7 @@
         </div>
     </div>
 
-    <!-- MODAL: Nowy Kredyt -->
+    <!-- MODAL: Kredyt -->
     <div id="loanModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
@@ -626,23 +628,23 @@
             <form id="loanForm" onsubmit="addLoan(event)" class="space-y-3">
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Nazwa kredytu / raty</label>
-                    <input type="text" id="loanName" required placeholder="np. Kredyt gotówkowy, Rata za auto" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                    <input type="text" id="loanName" required placeholder="np. Rata za auto" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">Miesięczna rata (zł)</label>
-                        <input type="number" step="0.01" id="loanMonthly" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                        <input type="number" step="0.01" id="loanMonthly" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
                     </div>
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">Suma do spłaty (zł)</label>
-                        <input type="number" step="0.01" id="loanTotal" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                        <input type="number" step="0.01" id="loanTotal" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
                     </div>
                 </div>
 
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Dzień płatności w miesiącu</label>
-                    <input type="number" min="1" max="31" id="loanDay" required placeholder="10" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                    <input type="number" min="1" max="31" id="loanDay" required placeholder="10" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
                 </div>
 
                 <button type="submit" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow-lg shadow-amber-900/20">Dodaj kredyt</button>
@@ -680,14 +682,12 @@
             monthInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
             monthInput.addEventListener('change', updateApp);
 
-            // Sprawdzanie powiadomień
             if ("Notification" in window && Notification.permission === "granted") {
                 const banner = document.getElementById('notifBanner');
                 if (banner) banner.style.display = 'none';
                 checkNotificationAlerts();
             }
 
-            // Inteligentne podpowiadanie kategorii
             document.getElementById('title').addEventListener('input', function(e) {
                 const val = e.target.value.toLowerCase();
                 const categorySelect = document.getElementById('category');
@@ -828,9 +828,7 @@
                 document.getElementById('pageTitle').innerText = "Oszczędności";
             }
 
-            if (fromSidebar) {
-                closeSidebar();
-            }
+            if (fromSidebar) closeSidebar();
         }
 
         function setType(type) {
@@ -873,21 +871,14 @@
             document.getElementById('editTxId').value = "";
             document.getElementById('modalTxTitle').innerText = "Nowa transakcja";
             document.getElementById('transactionForm').reset();
-            
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('txDate').value = today;
+            document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('debtType').value = "NONE";
-
             setType('expense');
             setAccount('Szymon');
             document.getElementById('transactionModal').classList.remove('hidden');
         }
 
-        function openModalForGF() {
-            openModal();
-            setAccount('Aga');
-        }
-
+        function openModalForGF() { openModal(); setAccount('Aga'); }
         function closeModal() {
             document.getElementById('transactionModal').classList.add('hidden');
             document.getElementById('transactionForm').reset();
@@ -898,10 +889,7 @@
             document.getElementById('transferForm').reset();
             document.getElementById('transferModal').classList.remove('hidden');
         }
-
-        function closeTransferModal() {
-            document.getElementById('transferModal').classList.add('hidden');
-        }
+        function closeTransferModal() { document.getElementById('transferModal').classList.add('hidden'); }
 
         function registerSharedTransfer(e) {
             e.preventDefault();
@@ -909,9 +897,8 @@
             const amount = parseFloat(document.getElementById('transferAmount').value);
             const title = document.getElementById('transferTitle').value;
             const dateVal = new Date().toISOString().split('T')[0];
-            const monthVal = dateVal.substring(0, 7);
 
-            const transferTx = {
+            transactions.push({
                 id: Date.now(),
                 title: `${title} (${fromAccount} ➔ Wspólne)`,
                 amount: amount,
@@ -920,11 +907,10 @@
                 targetAccount: 'Wspólne',
                 category: 'Konto Wspólne',
                 date: dateVal,
-                month: monthVal,
+                month: dateVal.substring(0, 7),
                 debtType: 'NONE'
-            };
+            });
 
-            transactions.push(transferTx);
             localStorage.setItem('budget_transactions', JSON.stringify(transactions));
             closeTransferModal();
             updateApp();
@@ -934,10 +920,7 @@
             document.getElementById('payDebtForm').reset();
             document.getElementById('payDebtModal').classList.remove('hidden');
         }
-
-        function closePayDebtModal() {
-            document.getElementById('payDebtModal').classList.add('hidden');
-        }
+        function closePayDebtModal() { document.getElementById('payDebtModal').classList.add('hidden'); }
 
         function registerDebtPayment(e) {
             e.preventDefault();
@@ -945,7 +928,6 @@
             const amount = parseFloat(document.getElementById('payAmount').value);
             const title = document.getElementById('payTitle').value;
             const dateVal = new Date().toISOString().split('T')[0];
-            const monthVal = dateVal.substring(0, 7);
 
             let payerAccount = 'Aga';
             let receiverAccount = 'Szymon';
@@ -957,7 +939,7 @@
                 debtTypeVal = 'SZYMON_PAYMENT_TO_AGA';
             }
 
-            const paymentTx = {
+            transactions.push({
                 id: Date.now(),
                 title: `${title} (${payerAccount} ➔ ${receiverAccount})`,
                 amount: amount,
@@ -966,11 +948,10 @@
                 targetAccount: receiverAccount,
                 category: 'Rozliczenie Długu',
                 date: dateVal,
-                month: monthVal,
+                month: dateVal.substring(0, 7),
                 debtType: debtTypeVal
-            };
+            });
 
-            transactions.push(paymentTx);
             localStorage.setItem('budget_transactions', JSON.stringify(transactions));
             closePayDebtModal();
             updateApp();
@@ -978,28 +959,21 @@
 
         function openScheduleModal() {
             document.getElementById('scheduleForm').reset();
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('schDueDate').value = today;
+            document.getElementById('schDueDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('scheduleModal').classList.remove('hidden');
         }
-
-        function closeScheduleModal() {
-            document.getElementById('scheduleModal').classList.add('hidden');
-        }
+        function closeScheduleModal() { document.getElementById('scheduleModal').classList.add('hidden'); }
 
         function applyTemplate(type) {
             if (type === 'czynsz') {
                 document.getElementById('schTitle').value = "Czynsz za mieszkanie";
                 document.getElementById('schMethod').value = "Przelew bankowy";
-                document.getElementById('schRecipient').value = "Administracja / Właściciel";
             } else if (type === 'prad') {
                 document.getElementById('schTitle').value = "Rachunek za prąd";
                 document.getElementById('schMethod').value = "Przelew bankowy";
-                document.getElementById('schRecipient').value = "PGE / Energa / Tauron";
             } else if (type === 'rata') {
                 document.getElementById('schTitle').value = "Rata za TV / RTV";
                 document.getElementById('schMethod').value = "Aplikacja banku";
-                document.getElementById('schRecipient').value = "Santander / Alior Bank";
             } else if (type === 'internet') {
                 document.getElementById('schTitle').value = "Internet / Światłowód";
                 document.getElementById('schMethod').value = "BLIK";
@@ -1008,7 +982,7 @@
 
         function saveScheduleItem(e) {
             e.preventDefault();
-            const newItem = {
+            scheduleItems.push({
                 id: Date.now(),
                 title: document.getElementById('schTitle').value,
                 amount: parseFloat(document.getElementById('schAmount').value),
@@ -1019,13 +993,11 @@
                 account: document.getElementById('schAccount').value,
                 repeat: document.getElementById('schRepeat').value,
                 paid: false
-            };
+            });
 
-            scheduleItems.push(newItem);
             localStorage.setItem('budget_schedule', JSON.stringify(scheduleItems));
             closeScheduleModal();
             updateApp();
-            checkNotificationAlerts();
         }
 
         function payScheduleItem(id) {
@@ -1033,9 +1005,7 @@
             if (!item) return;
 
             item.paid = true;
-            
             const dateVal = new Date().toISOString().split('T')[0];
-            const monthVal = dateVal.substring(0, 7);
 
             transactions.push({
                 id: Date.now(),
@@ -1045,7 +1015,7 @@
                 account: item.account,
                 category: item.title.toLowerCase().includes('czynsz') || item.title.toLowerCase().includes('prąd') ? 'Mieszkanie' : 'Kredyty / Raty',
                 date: dateVal,
-                month: monthVal,
+                month: dateVal.substring(0, 7),
                 debtType: 'NONE'
             });
 
@@ -1083,27 +1053,17 @@
 
             setType(tx.type === 'transfer' || tx.type === 'shared_transfer' ? 'expense' : tx.type);
             setAccount(tx.account);
-
             document.getElementById('transactionModal').classList.remove('hidden');
         }
 
         function openSubModal() { document.getElementById('subModal').classList.remove('hidden'); }
-        function closeSubModal() {
-            document.getElementById('subModal').classList.add('hidden');
-            document.getElementById('subForm').reset();
-        }
+        function closeSubModal() { document.getElementById('subModal').classList.add('hidden'); }
 
         function openBudgetPlanModal() { document.getElementById('plannerModal').classList.remove('hidden'); }
-        function closeBudgetPlanModal() {
-            document.getElementById('plannerModal').classList.add('hidden');
-            document.getElementById('plannerForm').reset();
-        }
+        function closeBudgetPlanModal() { document.getElementById('plannerModal').classList.add('hidden'); }
 
         function openLoanModal() { document.getElementById('loanModal').classList.remove('hidden'); }
-        function closeLoanModal() {
-            document.getElementById('loanModal').classList.add('hidden');
-            document.getElementById('loanForm').reset();
-        }
+        function closeLoanModal() { document.getElementById('loanModal').classList.add('hidden'); }
 
         function addOrUpdateTransaction(e) {
             e.preventDefault();
@@ -1128,7 +1088,7 @@
                     transactions[index].debtType = debtTypeVal;
                 }
             } else {
-                const newTx = {
+                transactions.push({
                     id: Date.now(),
                     title,
                     amount,
@@ -1138,8 +1098,7 @@
                     date: dateVal,
                     month: monthVal,
                     debtType: debtTypeVal
-                };
-                transactions.push(newTx);
+                });
             }
 
             localStorage.setItem('budget_transactions', JSON.stringify(transactions));
@@ -1149,11 +1108,12 @@
 
         function addSubscription(e) {
             e.preventDefault();
-            const name = document.getElementById('subName').value;
-            const amount = parseFloat(document.getElementById('subAmount').value);
-            const account = document.getElementById('subAccount').value;
-
-            subscriptions.push({ id: Date.now(), name, amount, account });
+            subscriptions.push({
+                id: Date.now(),
+                name: document.getElementById('subName').value,
+                amount: parseFloat(document.getElementById('subAmount').value),
+                account: document.getElementById('subAccount').value
+            });
             localStorage.setItem('budget_subscriptions', JSON.stringify(subscriptions));
             closeSubModal();
             updateApp();
@@ -1164,7 +1124,6 @@
             if (!sub) return;
 
             const dateVal = new Date().toISOString().split('T')[0];
-            const monthVal = dateVal.substring(0, 7);
 
             transactions.push({
                 id: Date.now(),
@@ -1174,7 +1133,7 @@
                 account: sub.account,
                 category: 'Subskrypcje',
                 date: dateVal,
-                month: monthVal,
+                month: dateVal.substring(0, 7),
                 debtType: 'NONE'
             });
 
@@ -1201,12 +1160,14 @@
 
         function addLoan(e) {
             e.preventDefault();
-            const name = document.getElementById('loanName').value;
-            const monthly = parseFloat(document.getElementById('loanMonthly').value);
-            const total = parseFloat(document.getElementById('loanTotal').value);
-            const day = parseInt(document.getElementById('loanDay').value);
-
-            loans.push({ id: Date.now(), name, monthly, total, paid: 0, day });
+            loans.push({
+                id: Date.now(),
+                name: document.getElementById('loanName').value,
+                monthly: parseFloat(document.getElementById('loanMonthly').value),
+                total: parseFloat(document.getElementById('loanTotal').value),
+                paid: 0,
+                day: parseInt(document.getElementById('loanDay').value)
+            });
             localStorage.setItem('budget_loans', JSON.stringify(loans));
             closeLoanModal();
             updateApp();
@@ -1217,7 +1178,6 @@
             if (!loan) return;
 
             const dateVal = new Date().toISOString().split('T')[0];
-            const monthVal = dateVal.substring(0, 7);
 
             loan.paid += loan.monthly;
             if (loan.paid > loan.total) loan.paid = loan.total;
@@ -1231,19 +1191,16 @@
                 account: 'Szymon',
                 category: 'Kredyty / Raty',
                 date: dateVal,
-                month: monthVal,
+                month: dateVal.substring(0, 7),
                 debtType: 'NONE'
             });
             localStorage.setItem('budget_transactions', JSON.stringify(transactions));
-
             updateApp();
         }
 
         function clearDebts() {
             if (confirm("Czy na pewno chcesz oznaczyć wszystkie długi jako rozliczone? Przeliczenie zostanie zresetowane do 0.")) {
-                transactions.forEach(t => {
-                    if (t.debtType) t.debtType = "CLEAR";
-                });
+                transactions.forEach(t => { if (t.debtType) t.debtType = "CLEAR"; });
                 localStorage.setItem('budget_transactions', JSON.stringify(transactions));
                 updateApp();
             }
@@ -1270,13 +1227,17 @@
             if (dateStr === yesterday) return '<span class="text-gray-400">Wczoraj</span>';
 
             const parts = dateStr.split('-');
-            if (parts.length === 3) {
-                return `${parts[2]}.${parts[1]}.${parts[0]}`;
-            }
-            return dateStr;
+            return parts.length === 3 ? `${parts[2]}.${parts[1]}.${parts[0]}` : dateStr;
         }
 
         function updateApp() {
+            // Ponowne odczytanie pamięci na wypadek odświeżenia
+            transactions = JSON.parse(localStorage.getItem('budget_transactions')) || [];
+            loans = JSON.parse(localStorage.getItem('budget_loans')) || [];
+            subscriptions = JSON.parse(localStorage.getItem('budget_subscriptions')) || [];
+            scheduleItems = JSON.parse(localStorage.getItem('budget_schedule')) || [];
+            budgetPlans = JSON.parse(localStorage.getItem('budget_plans')) || {};
+
             const selectedMonth = document.getElementById('currentMonth').value;
             const filterAcc = document.getElementById('filterAccount').value;
             
@@ -1302,18 +1263,13 @@
             debtListEl.innerHTML = '';
 
             transactions.forEach(t => {
-                if (t.debtType === 'SZYMON_FOR_AGA') {
-                    netDebtVal += t.amount;
-                } else if (t.debtType === 'AGA_FOR_SZYMON') {
-                    netDebtVal -= t.amount;
-                } else if (t.debtType === 'PRIV_FOR_SHARED') {
+                if (t.debtType === 'SZYMON_FOR_AGA') netDebtVal += t.amount;
+                else if (t.debtType === 'AGA_FOR_SZYMON') netDebtVal -= t.amount;
+                else if (t.debtType === 'PRIV_FOR_SHARED') {
                     if (t.account === 'Szymon') netDebtVal += (t.amount / 2);
                     else if (t.account === 'Aga') netDebtVal -= (t.amount / 2);
-                } else if (t.debtType === 'AGA_PAYMENT_TO_SZYMON') {
-                    netDebtVal -= t.amount;
-                } else if (t.debtType === 'SZYMON_PAYMENT_TO_AGA') {
-                    netDebtVal += t.amount;
-                }
+                } else if (t.debtType === 'AGA_PAYMENT_TO_SZYMON') netDebtVal -= t.amount;
+                else if (t.debtType === 'SZYMON_PAYMENT_TO_AGA') netDebtVal += t.amount;
             });
 
             const debtBigEl = document.getElementById('debtSummaryBig');
@@ -1340,9 +1296,7 @@
 
             let grandTotalSavings = 0;
             transactions.forEach(t => {
-                if (t.category === 'Oszczędności' && t.type === 'expense') {
-                    grandTotalSavings += t.amount;
-                }
+                if (t.category === 'Oszczędności' && t.type === 'expense') grandTotalSavings += t.amount;
             });
             document.getElementById('grandTotalSavings').innerText = grandTotalSavings.toFixed(2) + ' zł';
 
@@ -1361,13 +1315,8 @@
                 }
 
                 if (isTransfer) {
-                    if (t.debtType === 'AGA_PAYMENT_TO_SZYMON') {
-                        agaBal -= t.amount;
-                        szymonBal += t.amount;
-                    } else if (t.debtType === 'SZYMON_PAYMENT_TO_AGA') {
-                        szymonBal -= t.amount;
-                        agaBal += t.amount;
-                    }
+                    if (t.debtType === 'AGA_PAYMENT_TO_SZYMON') { agaBal -= t.amount; szymonBal += t.amount; }
+                    else if (t.debtType === 'SZYMON_PAYMENT_TO_AGA') { szymonBal -= t.amount; agaBal += t.amount; }
                 } else if (isSharedTransfer) {
                     if (t.account === 'Szymon') szymonBal -= t.amount;
                     else if (t.account === 'Aga') agaBal -= t.amount;
@@ -1384,24 +1333,15 @@
                 else if (isSharedTransfer) iconClass = 'fa-vault text-violet-400 bg-violet-500/10';
                 else if (t.category === 'Kredyty / Raty') iconClass = 'fa-credit-card text-amber-400 bg-amber-500/10';
                 else if (t.category === 'Oszczędności') iconClass = 'fa-piggy-bank text-sky-400 bg-sky-500/10';
-                else if (t.category === 'Subskrypcje') iconClass = 'fa-rotate-right text-sky-400 bg-sky-500/10';
 
                 let accountBadge = '<span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-medium ml-1">Szymon</span>';
-                if (t.account === 'Aga') {
-                    accountBadge = '<span class="text-[9px] bg-pink-500/20 text-pink-300 px-1.5 py-0.5 rounded font-medium ml-1">Aga</span>';
-                } else if (t.account === 'Wspólne') {
-                    accountBadge = '<span class="text-[9px] bg-violet-500/20 text-violet-300 px-1.5 py-0.5 rounded font-medium ml-1">Wspólne</span>';
-                }
+                if (t.account === 'Aga') accountBadge = '<span class="text-[9px] bg-pink-500/20 text-pink-300 px-1.5 py-0.5 rounded font-medium ml-1">Aga</span>';
+                else if (t.account === 'Wspólne') accountBadge = '<span class="text-[9px] bg-violet-500/20 text-violet-300 px-1.5 py-0.5 rounded font-medium ml-1">Wspólne</span>';
 
                 let debtBadge = '';
                 if (t.debtType === 'SZYMON_FOR_AGA') debtBadge = '<span class="text-[9px] bg-amber-500/20 text-amber-300 px-1 py-0.5 rounded ml-1">Dług: Za Agę</span>';
                 else if (t.debtType === 'AGA_FOR_SZYMON') debtBadge = '<span class="text-[9px] bg-amber-500/20 text-amber-300 px-1 py-0.5 rounded ml-1">Dług: Za Szymona</span>';
                 else if (t.debtType === 'PRIV_FOR_SHARED') debtBadge = '<span class="text-[9px] bg-sky-500/20 text-sky-300 px-1 py-0.5 rounded ml-1">Na wspólne</span>';
-                else if (t.debtType === 'AGA_PAYMENT_TO_SZYMON') debtBadge = '<span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1 py-0.5 rounded ml-1">Spłata: Aga ➔ Szymon</span>';
-                else if (t.debtType === 'SZYMON_PAYMENT_TO_AGA') debtBadge = '<span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1 py-0.5 rounded ml-1">Spłata: Szymon ➔ Aga</span>';
-                else if (isSharedTransfer) debtBadge = '<span class="text-[9px] bg-violet-500/20 text-violet-300 px-1 py-0.5 rounded ml-1">Zasilenie wspólnego</span>';
-
-                const dateDisplay = formatDateLabel(t.date);
 
                 const itemHtml = `
                     <div class="flex justify-between items-center bg-gray-900 border border-gray-800 p-2.5 rounded-xl text-sm">
@@ -1418,7 +1358,7 @@
                                 <div class="flex items-center gap-2 text-[10px] text-gray-500 mt-0.5">
                                     <span>${t.category}</span>
                                     <span>•</span>
-                                    <span>${dateDisplay}</span>
+                                    <span>${formatDateLabel(t.date)}</span>
                                 </div>
                             </div>
                         </div>
@@ -1432,42 +1372,19 @@
                     </div>
                 `;
 
-                if (filterAcc === 'ALL' || t.account === filterAcc) {
-                    listEl.insertAdjacentHTML('beforeend', itemHtml);
-                }
-
-                if (t.account === 'Aga' || t.debtType === 'AGA_PAYMENT_TO_SZYMON' || t.debtType === 'SZYMON_PAYMENT_TO_AGA') {
-                    gfListEl.insertAdjacentHTML('beforeend', itemHtml);
-                }
-
-                if (t.debtType && t.debtType !== 'NONE' && t.debtType !== 'CLEAR') {
-                    debtListEl.insertAdjacentHTML('beforeend', itemHtml);
-                }
-
-                if (t.category === 'Oszczędności' && t.type === 'expense') {
-                    savingsListEl.insertAdjacentHTML('beforeend', itemHtml);
-                }
+                if (filterAcc === 'ALL' || t.account === filterAcc) listEl.insertAdjacentHTML('beforeend', itemHtml);
+                if (t.account === 'Aga' || t.debtType === 'AGA_PAYMENT_TO_SZYMON' || t.debtType === 'SZYMON_PAYMENT_TO_AGA') gfListEl.insertAdjacentHTML('beforeend', itemHtml);
+                if (t.debtType && t.debtType !== 'NONE' && t.debtType !== 'CLEAR') debtListEl.insertAdjacentHTML('beforeend', itemHtml);
+                if (t.category === 'Oszczędności' && t.type === 'expense') savingsListEl.insertAdjacentHTML('beforeend', itemHtml);
             });
 
-            if (listEl.innerHTML === '') {
-                listEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Brak wpisów w tym miesiącu</p>';
-            }
-
-            if (gfListEl.innerHTML === '') {
-                gfListEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Brak wpisów na koncie Agi w tym miesiącu</p>';
-            }
-
-            if (debtListEl.innerHTML === '') {
-                debtListEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Brak aktywnych wpisów dotyczących długów i spłat</p>';
-            }
-
-            if (savingsListEl.innerHTML === '') {
-                savingsListEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Brak wpisanych oszczędności w tym miesiącu</p>';
-            }
+            if (listEl.innerHTML === '') listEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Brak wpisów w tym miesiącu</p>';
+            if (gfListEl.innerHTML === '') gfListEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Brak wpisów na koncie Agi</p>';
+            if (debtListEl.innerHTML === '') debtListEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Brak aktywnych długów</p>';
+            if (savingsListEl.innerHTML === '') savingsListEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Brak wpisanych oszczędności</p>';
 
             document.getElementById('totalIncome').innerText = income.toFixed(2) + ' zł';
             document.getElementById('totalExpense').innerText = expense.toFixed(2) + ' zł';
-            
             document.getElementById('privateBalance').innerText = szymonBal.toFixed(2) + ' zł';
             document.getElementById('gfBalance').innerText = agaBal.toFixed(2) + ' zł';
             document.getElementById('gfTabBalance').innerText = agaBal.toFixed(2) + ' zł';
@@ -1506,15 +1423,11 @@
                 const isToday = !item.paid && item.dueDate === today;
 
                 let statusBadge = `<span class="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-lg">Termin: ${item.dueDate}</span>`;
-                if (item.paid) {
-                    statusBadge = `<span class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-lg"><i class="fa-solid fa-check mr-1"></i>Opłacone</span>`;
-                } else if (isOverdue) {
-                    statusBadge = `<span class="text-[10px] bg-rose-500/20 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded-lg font-bold"><i class="fa-solid fa-exclamation-triangle mr-1"></i>Zaległe (${item.dueDate})</span>`;
-                } else if (isToday) {
-                    statusBadge = `<span class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-lg font-bold"><i class="fa-solid fa-clock mr-1"></i>Płatne Dzisiaj!</span>`;
-                }
+                if (item.paid) statusBadge = `<span class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-lg"><i class="fa-solid fa-check mr-1"></i>Opłacone</span>`;
+                else if (isOverdue) statusBadge = `<span class="text-[10px] bg-rose-500/20 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded-lg font-bold"><i class="fa-solid fa-exclamation-triangle mr-1"></i>Zaległe (${item.dueDate})</span>`;
+                else if (isToday) statusBadge = `<span class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-lg font-bold"><i class="fa-solid fa-clock mr-1"></i>Płatne Dzisiaj!</span>`;
 
-                const cardHtml = `
+                schEl.insertAdjacentHTML('beforeend', `
                     <div class="bg-gray-900 border ${isOverdue ? 'border-rose-500/50' : 'border-gray-800'} p-3.5 rounded-2xl space-y-2.5">
                         <div class="flex justify-between items-start">
                             <div>
@@ -1526,7 +1439,6 @@
                             </div>
                             <button onclick="deleteScheduleItem(${item.id})" class="text-gray-600 hover:text-rose-400 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
                         </div>
-
                         <div class="bg-gray-950/60 p-2.5 rounded-xl text-xs space-y-1 text-gray-400">
                             <div class="flex justify-between"><span>Forma płatności:</span> <strong class="text-gray-300">${item.method}</strong></div>
                             ${item.recipient ? `<div class="flex justify-between"><span>Odbiorca / Tytuł:</span> <strong class="text-gray-300">${item.recipient}</strong></div>` : ''}
@@ -1539,15 +1451,13 @@
                                 </div>
                             ` : ''}
                         </div>
-
                         ${!item.paid ? `
                             <button onclick="payScheduleItem(${item.id})" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs py-2 rounded-xl transition flex items-center justify-center gap-1.5 shadow">
                                 <i class="fa-solid fa-check"></i> Oznacz jako zapłacone
                             </button>
                         ` : ''}
                     </div>
-                `;
-                schEl.insertAdjacentHTML('beforeend', cardHtml);
+                `);
             });
         }
 
@@ -1570,7 +1480,7 @@
                     ? '<span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-md"><i class="fa-solid fa-check mr-1"></i>Opłacone</span>'
                     : `<button onclick="paySubscription(${sub.id})" class="text-[10px] bg-sky-500/20 text-sky-400 hover:bg-sky-500/30 border border-sky-500/30 px-2 py-1 rounded-md transition"><i class="fa-solid fa-plus mr-1"></i>Dodaj do tego miesiąca</button>`;
 
-                const item = `
+                listEl.insertAdjacentHTML('beforeend', `
                     <div class="flex justify-between items-center bg-gray-950/60 border border-gray-800 p-3 rounded-xl">
                         <div>
                             <div class="flex items-center gap-1.5">
@@ -1584,18 +1494,16 @@
                             <button onclick="deleteSubscription(${sub.id})" class="text-gray-600 hover:text-rose-400 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
-                `;
-                listEl.insertAdjacentHTML('beforeend', item);
+                `);
 
-                const quickItem = `
+                quickListEl.insertAdjacentHTML('beforeend', `
                     <div class="flex justify-between items-center py-1 border-b border-gray-800/50 last:border-0">
                         <span class="text-gray-300">${sub.name} (${sub.amount.toFixed(2)} zł)</span>
                         ${paidThisMonth 
                             ? '<span class="text-emerald-400 font-medium"><i class="fa-solid fa-check"></i></span>'
                             : `<button onclick="paySubscription(${sub.id})" class="text-sky-400 hover:underline">Dodaj</button>`}
                     </div>
-                `;
-                quickListEl.insertAdjacentHTML('beforeend', quickItem);
+                `);
             });
         }
 
@@ -1603,9 +1511,7 @@
             const listEl = document.getElementById('plannerList');
             listEl.innerHTML = '';
 
-            const categoryList = ["Jedzenie", "Mieszkanie", "Auto", "Subskrypcje", "Zdrowie", "Inne"];
-
-            categoryList.forEach(cat => {
+            ["Jedzenie", "Mieszkanie", "Auto", "Subskrypcje", "Zdrowie", "Inne"].forEach(cat => {
                 const limit = budgetPlans[cat] || 0;
                 const spent = categories[cat] || 0;
                 const percent = limit > 0 ? Math.min(100, Math.round((spent / limit) * 100)) : 0;
@@ -1614,7 +1520,7 @@
                 if (percent > 80) barColor = 'bg-amber-500';
                 if (percent >= 100) barColor = 'bg-rose-500';
 
-                const item = `
+                listEl.insertAdjacentHTML('beforeend', `
                     <div class="bg-gray-950/60 border border-gray-800 p-3 rounded-xl space-y-1.5">
                         <div class="flex justify-between items-center text-xs">
                             <span class="font-semibold text-gray-200">${cat}</span>
@@ -1632,8 +1538,7 @@
                         </div>
                         ` : ''}
                     </div>
-                `;
-                listEl.insertAdjacentHTML('beforeend', item);
+                `);
             });
         }
 
@@ -1648,7 +1553,7 @@
 
             loans.forEach(loan => {
                 const percent = Math.min(100, Math.round((loan.paid / loan.total) * 100));
-                const item = `
+                loansEl.insertAdjacentHTML('beforeend', `
                     <div class="bg-gray-950/60 border border-gray-800 p-3.5 rounded-xl space-y-2">
                         <div class="flex justify-between items-start">
                             <div>
@@ -1657,22 +1562,18 @@
                             </div>
                             <button onclick="deleteLoan(${loan.id})" class="text-gray-500 hover:text-rose-400 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
                         </div>
-
                         <div class="flex justify-between items-center text-xs mt-1">
                             <span class="text-gray-400">Rata: <strong class="text-white">${loan.monthly.toFixed(2)} zł</strong></span>
                             <span class="text-amber-400 font-semibold">${loan.paid.toFixed(2)} / ${loan.total.toFixed(2)} zł (${percent}%)</span>
                         </div>
-
                         <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
                             <div class="bg-amber-500 h-full rounded-full transition-all duration-300" style="width: ${percent}%"></div>
                         </div>
-
                         <button onclick="payLoan(${loan.id})" class="w-full mt-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 font-medium text-xs py-2 rounded-xl transition flex items-center justify-center gap-1.5">
                             <i class="fa-solid fa-check"></i> Opłać ratę w tym miesiącu
                         </button>
                     </div>
-                `;
-                loansEl.insertAdjacentHTML('beforeend', item);
+                `);
             });
         }
 
@@ -1682,7 +1583,6 @@
             const data = Object.values(categories);
 
             if (chartInstance) chartInstance.destroy();
-
             if (labels.length === 0) {
                 ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
                 return;
@@ -1699,15 +1599,13 @@
                 'Inne': '#64748b'
             };
 
-            const bgColors = labels.map(l => colorMap[l] || '#9ca3af');
-
             chartInstance = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: labels,
                     datasets: [{
                         data: data,
-                        backgroundColor: bgColors,
+                        backgroundColor: labels.map(l => colorMap[l] || '#9ca3af'),
                         borderWidth: 0
                     }]
                 },
@@ -1717,11 +1615,7 @@
                     plugins: {
                         legend: {
                             position: 'right',
-                            labels: {
-                                color: '#9ca3af',
-                                boxWidth: 10,
-                                font: { size: 10 }
-                            }
+                            labels: { color: '#9ca3af', boxWidth: 10, font: { size: 10 } }
                         }
                     }
                 }
