@@ -78,7 +78,7 @@
         </div>
     </aside>
 
-    <!-- Nagłówek -->
+    <!-- Nagłówek Z ZEGAREM / DZISIEJSZĄ DATĄ -->
     <header class="bg-gray-900 border-b border-gray-800 sticky top-0 z-40 shadow-md">
         <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-2.5">
@@ -93,15 +93,14 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <button onclick="updateApp()" class="text-gray-400 hover:text-emerald-400 p-1.5 bg-gray-800 border border-gray-700 rounded-lg text-xs" title="Odśwież dane">
-                    <i class="fa-solid fa-arrows-rotate"></i>
+                <button onclick="syncDataFromCloud()" class="text-gray-400 hover:text-emerald-400 p-1.5 bg-gray-800 border border-gray-700 rounded-lg text-xs flex items-center gap-1" title="Synchronizuj z chmurą">
+                    <i class="fa-solid fa-cloud-arrow-down text-emerald-400"></i> <span id="syncStatusText" class="text-[10px]">Odśwież</span>
                 </button>
                 <input type="month" id="currentMonth" class="bg-gray-800 text-xs border border-gray-700 rounded-lg px-2 py-1 focus:outline-none focus:border-emerald-500 text-white">
             </div>
         </div>
     </header>
 
-    <!-- Główna zawartość elastyczna (wąska na mobile, szeroka na PC) -->
     <main class="max-w-4xl mx-auto px-4 mt-4 space-y-4">
 
         <!-- WIDOK: PULPIT GŁÓWNY -->
@@ -123,13 +122,12 @@
                 </div>
             </div>
 
-            <!-- Przelew na konto wspólne -->
+            <!-- Przycisk przelewu na konto wspólne -->
             <button onclick="openTransferModal()" class="w-full bg-gradient-to-r from-violet-900/40 to-gray-900 border border-violet-500/30 hover:border-violet-500/50 text-violet-300 font-medium py-3 px-4 rounded-xl transition text-xs sm:text-sm flex items-center justify-center gap-2 shadow">
                 <i class="fa-solid fa-vault text-violet-400"></i> Przelew z prywatnego na Konto Wspólne
             </button>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Lewa kolumna na PC -->
                 <div class="space-y-4">
                     <!-- Baner spłat nadchodzących -->
                     <div id="quickScheduleWidget" onclick="switchTab('schedule', false)" class="bg-gradient-to-r from-indigo-950/40 to-gray-900 border border-indigo-500/30 p-3.5 rounded-2xl shadow flex justify-between items-center cursor-pointer hover:border-indigo-500/60 transition">
@@ -140,7 +138,7 @@
                         <i class="fa-solid fa-chevron-right text-indigo-400 text-xs"></i>
                     </div>
 
-                    <!-- Moduł długów -->
+                    <!-- Moduł stanu długów/rozliczenia -->
                     <div id="quickDebtWidget" class="bg-gradient-to-r from-amber-950/40 to-gray-900 border border-amber-500/30 p-3.5 rounded-2xl shadow flex justify-between items-center">
                         <div>
                             <span class="text-[11px] text-amber-400 font-semibold block uppercase tracking-wider"><i class="fa-solid fa-scale-balanced mr-1"></i> Wzajemne rozliczenie</span>
@@ -151,7 +149,7 @@
                         </button>
                     </div>
 
-                    <!-- Podsumowanie -->
+                    <!-- Podsumowanie miesiąca -->
                     <div class="grid grid-cols-2 gap-3">
                         <div class="bg-gray-900 border border-gray-800 p-3 rounded-xl">
                             <span class="text-[11px] text-gray-400 block"><i class="fa-solid fa-arrow-trend-up text-emerald-500 mr-1"></i> Przychody razem</span>
@@ -163,12 +161,12 @@
                         </div>
                     </div>
 
+                    <!-- Przycisk dodawania transakcji -->
                     <button onclick="openModal()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 px-4 rounded-2xl transition shadow-lg shadow-emerald-900/20 flex items-center justify-center gap-2">
                         <i class="fa-solid fa-plus"></i> Dodaj transakcję
                     </button>
                 </div>
 
-                <!-- Prawa kolumna na PC -->
                 <div class="space-y-4">
                     <!-- Wykres -->
                     <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow">
@@ -178,7 +176,7 @@
                         </div>
                     </div>
 
-                    <!-- Subskrypcje szybki wgląd -->
+                    <!-- Szybki stan subskrypcji -->
                     <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow space-y-2">
                         <div class="flex justify-between items-center">
                             <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider"><i class="fa-solid fa-rotate-right text-sky-400 mr-1"></i> Subskrypcje w tym miesiącu</h2>
@@ -189,7 +187,7 @@
                 </div>
             </div>
 
-            <!-- Lista transakcji -->
+            <!-- Lista transakcji z filtrowaniem -->
             <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow space-y-3">
                 <div class="flex justify-between items-center">
                     <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Ostatnie wpisy</h2>
@@ -204,8 +202,34 @@
             </div>
         </div>
 
-        <!-- WIDOK: HARMONOGRAM SPŁAT -->
+        <!-- WIDOK: HARMONOGRAM SPŁAT I OPŁAT -->
         <div id="tab-schedule" class="space-y-4 hidden">
+            <div class="bg-indigo-950/50 border border-indigo-500/30 p-4 rounded-2xl shadow space-y-3">
+                <div id="notifBanner" class="flex justify-between items-center border-b border-indigo-500/20 pb-3">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-bell text-indigo-400 text-lg"></i>
+                        <div>
+                            <span class="text-xs font-bold block text-indigo-200">Powiadomienia w telefonie</span>
+                            <span class="text-[10px] text-gray-400">Otrzymuj przypomnienia na telefon</span>
+                        </div>
+                    </div>
+                    <button onclick="requestNotificationPermission()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium px-3 py-1.5 rounded-xl transition">
+                        Włącz
+                    </button>
+                </div>
+                <div class="flex justify-between items-center pt-1">
+                    <label for="notifTiming" class="text-xs font-medium text-gray-300 flex items-center gap-1.5">
+                        <i class="fa-solid fa-clock text-indigo-400"></i> Kiedy przypominać?
+                    </label>
+                    <select id="notifTiming" onchange="saveNotificationTiming()" class="bg-gray-900 border border-indigo-500/30 text-indigo-200 text-xs rounded-xl px-2.5 py-1.5">
+                        <option value="0">W dniu płatności</option>
+                        <option value="1">1 dzień wcześniej</option>
+                        <option value="3">3 dni wcześniej</option>
+                        <option value="7">7 dni wcześniej</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="flex justify-between items-center">
                 <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Nadchodzące opłaty i raty</h2>
                 <button onclick="openScheduleModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 shadow">
@@ -221,7 +245,6 @@
                 <span class="text-xs text-amber-400 font-semibold block uppercase tracking-wider">Stan wzajemnych rozliczeń</span>
                 <span id="debtSummaryBig" class="text-2xl font-black text-amber-300 block">0,00 zł</span>
                 <p id="debtDetailSub" class="text-xs text-gray-400">Jesteście całkowicie rozliczeni!</p>
-                
                 <div class="flex gap-2 justify-center pt-1">
                     <button onclick="openPayDebtModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-xl transition shadow flex items-center gap-1.5">
                         <i class="fa-solid fa-money-bill-transfer"></i> Rozlicz dług (Wpisz spłatę)
@@ -231,7 +254,6 @@
                     </button>
                 </div>
             </div>
-
             <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow">
                 <h2 class="text-xs font-semibold text-amber-400 mb-3 uppercase tracking-wider">Historia długów i spłat</h2>
                 <div id="debtTransactionList" class="space-y-2.5 max-h-96 overflow-y-auto pr-1"></div>
@@ -249,20 +271,19 @@
                     <i class="fa-solid fa-plus mr-1"></i> Dodaj wpis Agi
                 </button>
             </div>
-
             <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow">
                 <h2 class="text-xs font-semibold text-pink-400 mb-3 uppercase tracking-wider">Prywatne transakcje Agi</h2>
                 <div id="gfTransactionList" class="space-y-2.5 max-h-96 overflow-y-auto pr-1"></div>
             </div>
         </div>
 
-        <!-- WIDOK: SUBSKRYPCJE -->
+        <!-- WIDOK: SUBSKRYPCJE I OPŁATY STAŁE -->
         <div id="tab-subscriptions" class="space-y-4 hidden">
             <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow space-y-3">
                 <div class="flex justify-between items-center">
                     <div>
                         <h2 class="text-sm font-bold text-gray-200">Stałe Subskrypcje</h2>
-                        <p class="text-xs text-gray-400">Netflix, Spotify, Siłownia</p>
+                        <p class="text-xs text-gray-400">Netflix, Spotify, Siłownia, Opłaty</p>
                     </div>
                     <button onclick="openSubModal()" class="text-xs bg-sky-500/20 text-sky-400 border border-sky-500/30 px-3 py-1.5 rounded-xl hover:bg-sky-500/30 transition">
                         <i class="fa-solid fa-plus mr-1"></i> Dodaj
@@ -272,7 +293,7 @@
             </div>
         </div>
 
-        <!-- WIDOK: PLANOWANE WYDATKI -->
+        <!-- WIDOK: PLANOWANE WYDATKI (PLANNER) -->
         <div id="tab-planner" class="space-y-4 hidden">
             <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow space-y-3">
                 <div class="flex justify-between items-center">
@@ -288,7 +309,7 @@
             </div>
         </div>
 
-        <!-- WIDOK: KREDYTY -->
+        <!-- WIDOK: KREDYTY I RATY -->
         <div id="tab-loans" class="space-y-4 hidden">
             <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow">
                 <div class="flex justify-between items-center mb-3">
@@ -307,7 +328,6 @@
                 <span class="text-xs text-sky-400 font-medium block">Łączne oszczędności (Wszystkie miesiące)</span>
                 <span id="grandTotalSavings" class="text-2xl font-black text-sky-300 mt-1 block">0,00 zł</span>
             </div>
-
             <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow">
                 <h2 class="text-xs font-semibold text-gray-400 mb-3 uppercase tracking-wider">Oszczędności w tym miesiącu</h2>
                 <div id="savingsList" class="space-y-2.5 max-h-96 overflow-y-auto pr-1"></div>
@@ -317,80 +337,32 @@
     </main>
 
     <!-- MODALE -->
-    <!-- MODAL: Harmonogram -->
+    <!-- MODAL: Harmonogram Spłat -->
     <div id="scheduleModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-2xl p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
                 <h3 class="font-bold text-base text-indigo-400"><i class="fa-solid fa-calendar-plus mr-1"></i> Dodaj opłatę do harmonogramu</h3>
                 <button onclick="closeScheduleModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-
             <form id="scheduleForm" onsubmit="saveScheduleItem(event)" class="space-y-3">
-                <div>
-                    <label class="text-[11px] text-gray-400 block mb-1">Szybki szablon płatności:</label>
-                    <div class="flex gap-1.5 overflow-x-auto pb-1">
-                        <button type="button" onclick="applyTemplate('czynsz')" class="bg-gray-800 hover:bg-gray-700 text-gray-300 text-[10px] px-2.5 py-1 rounded-lg border border-gray-700 whitespace-nowrap">🏠 Czynsz</button>
-                        <button type="button" onclick="applyTemplate('prad')" class="bg-gray-800 hover:bg-gray-700 text-gray-300 text-[10px] px-2.5 py-1 rounded-lg border border-gray-700 whitespace-nowrap">⚡ Prąd</button>
-                        <button type="button" onclick="applyTemplate('rata')" class="bg-gray-800 hover:bg-gray-700 text-gray-300 text-[10px] px-2.5 py-1 rounded-lg border border-gray-700 whitespace-nowrap">📺 Rata TV</button>
-                        <button type="button" onclick="applyTemplate('internet')" class="bg-gray-800 hover:bg-gray-700 text-gray-300 text-[10px] px-2.5 py-1 rounded-lg border border-gray-700 whitespace-nowrap">🌐 Internet</button>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Nazwa płatności</label>
-                    <input type="text" id="schTitle" required placeholder="np. Czynsz" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
-                </div>
-
+                <input type="text" id="schTitle" required placeholder="np. Czynsz" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
                 <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="text-xs text-gray-400 block mb-1">Kwota (zł)</label>
-                        <input type="number" step="0.01" id="schAmount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
-                    </div>
-                    <div>
-                        <label class="text-xs text-gray-400 block mb-1">Termin płatności</label>
-                        <input type="date" id="schDueDate" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-2.5 py-1.5 text-xs text-white">
-                    </div>
+                    <input type="number" step="0.01" id="schAmount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
+                    <input type="date" id="schDueDate" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-2.5 py-1.5 text-xs text-white">
                 </div>
-
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Sposób zapłaty</label>
-                    <select id="schMethod" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white">
-                        <option value="Przelew bankowy">Przelew bankowy</option>
-                        <option value="Aplikacja banku">Aplikacja banku</option>
-                        <option value="BLIK">BLIK</option>
-                        <option value="Karta / Płatność automatyczna">Karta / Płatność automatyczna</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Numer konta / IBAN (opcjonalnie)</label>
-                    <input type="text" id="schIban" placeholder="00 0000..." class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white">
-                </div>
-
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Odbiorca / Uwagi</label>
-                    <input type="text" id="schRecipient" placeholder="np. Spółdzielnia" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white">
-                </div>
-
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="text-xs text-gray-400 block mb-1">Z jakiego konta?</label>
-                        <select id="schAccount" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white">
-                            <option value="Wspólne">Konto Wspólne</option>
-                            <option value="Szymon">Szymon</option>
-                            <option value="Aga">Aga</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-xs text-gray-400 block mb-1">Powtarzalność</label>
-                        <select id="schRepeat" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white">
-                            <option value="Co miesiąc">Co miesiąc</option>
-                            <option value="Jednorazowo">Jednorazowo</option>
-                        </select>
-                    </div>
-                </div>
-
-                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow">Zapisz płatność</button>
+                <select id="schMethod" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white">
+                    <option value="Przelew bankowy">Przelew bankowy</option>
+                    <option value="BLIK">BLIK</option>
+                    <option value="Karta">Karta</option>
+                </select>
+                <input type="text" id="schIban" placeholder="Numer IBAN (opcjonalnie)" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white">
+                <input type="text" id="schRecipient" placeholder="Odbiorca" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white">
+                <select id="schAccount" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white">
+                    <option value="Wspólne">Konto Wspólne</option>
+                    <option value="Szymon">Szymon</option>
+                    <option value="Aga">Aga</option>
+                </select>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-3 rounded-xl transition">Zapisz płatność</button>
             </form>
         </div>
     </div>
@@ -402,68 +374,39 @@
                 <h3 id="modalTxTitle" class="font-bold text-base">Nowa transakcja</h3>
                 <button onclick="closeModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-
             <form id="transactionForm" onsubmit="addOrUpdateTransaction(event)" class="space-y-3">
                 <input type="hidden" id="editTxId" value="">
-
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Konto / Kto płacił?</label>
-                    <div class="grid grid-cols-3 gap-1.5">
-                        <button type="button" id="accountSzymonBtn" onclick="setAccount('Szymon')" class="py-2 rounded-xl text-[11px] font-medium border border-emerald-500/50 bg-emerald-500/10 text-emerald-400 transition">Szymon</button>
-                        <button type="button" id="accountAgaBtn" onclick="setAccount('Aga')" class="py-2 rounded-xl text-[11px] font-medium border border-gray-800 bg-gray-800 text-gray-400 transition">Aga</button>
-                        <button type="button" id="accountSharedBtn" onclick="setAccount('Wspólne')" class="py-2 rounded-xl text-[11px] font-medium border border-gray-800 bg-gray-800 text-gray-400 transition">Wspólne</button>
-                    </div>
+                <div class="grid grid-cols-3 gap-1.5">
+                    <button type="button" id="accountSzymonBtn" onclick="setAccount('Szymon')" class="py-2 rounded-xl text-[11px] font-medium border border-emerald-500/50 bg-emerald-500/10 text-emerald-400">Szymon</button>
+                    <button type="button" id="accountAgaBtn" onclick="setAccount('Aga')" class="py-2 rounded-xl text-[11px] font-medium border border-gray-800 bg-gray-800 text-gray-400">Aga</button>
+                    <button type="button" id="accountSharedBtn" onclick="setAccount('Wspólne')" class="py-2 rounded-xl text-[11px] font-medium border border-gray-800 bg-gray-800 text-gray-400">Wspólne</button>
                 </div>
-
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Za kogo jest ten wydatek? (Dług)</label>
-                    <select id="debtType" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-amber-300">
-                        <option value="NONE">Za siebie (Zwykły wydatek)</option>
-                        <option value="SZYMON_FOR_AGA">Szymon płacił ZA AGĘ (Aga wisi Szymonowi)</option>
-                        <option value="AGA_FOR_SZYMON">Aga płaciła ZA SZYMONA (Szymon wisi Adze)</option>
-                        <option value="PRIV_FOR_SHARED">Prywatne środki na wydatek WSPÓLNY (Rozlicz po połowie)</option>
-                    </select>
-                </div>
-
+                <select id="debtType" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-amber-300">
+                    <option value="NONE">Za siebie (Zwykły wydatek)</option>
+                    <option value="SZYMON_FOR_AGA">Szymon płacił ZA AGĘ</option>
+                    <option value="AGA_FOR_SZYMON">Aga płaciła ZA SZYMONA</option>
+                    <option value="PRIV_FOR_SHARED">Prywatne na wydatek WSPÓLNY</option>
+                </select>
                 <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="text-xs text-gray-400 block mb-1">Typ</label>
-                        <div class="grid grid-cols-2 gap-1">
-                            <button type="button" id="typeExpenseBtn" onclick="setType('expense')" class="py-2 rounded-xl text-[11px] font-medium border border-rose-500/50 bg-rose-500/10 text-rose-400 transition">Wydatek</button>
-                            <button type="button" id="typeIncomeBtn" onclick="setType('income')" class="py-2 rounded-xl text-[11px] font-medium border border-gray-800 bg-gray-800 text-gray-400 transition">Przychód</button>
-                        </div>
+                    <div class="grid grid-cols-2 gap-1">
+                        <button type="button" id="typeExpenseBtn" onclick="setType('expense')" class="py-2 rounded-xl text-[11px] border border-rose-500/50 bg-rose-500/10 text-rose-400">Wydatek</button>
+                        <button type="button" id="typeIncomeBtn" onclick="setType('income')" class="py-2 rounded-xl text-[11px] border border-gray-800 bg-gray-800 text-gray-400">Przychód</button>
                     </div>
-                    <div>
-                        <label class="text-xs text-gray-400 block mb-1">Data transakcji</label>
-                        <input type="date" id="txDate" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-2.5 py-1.5 text-xs text-white">
-                    </div>
+                    <input type="date" id="txDate" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-2.5 py-1.5 text-xs text-white">
                 </div>
-
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Nazwa</label>
-                    <input type="text" id="title" required placeholder="np. Biedronka, Paliwo" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
-                </div>
-
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Kwota (zł)</label>
-                    <input type="number" step="0.01" id="amount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
-                </div>
-
-                <div id="categoryContainer">
-                    <label class="text-xs text-gray-400 block mb-1">Kategoria</label>
-                    <select id="category" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
-                        <option value="Jedzenie">Jedzenie i Zakupy</option>
-                        <option value="Mieszkanie">Mieszkanie / Rachunki</option>
-                        <option value="Subskrypcje">Subskrypcje / Rozrywka</option>
-                        <option value="Kredyty / Raty">Kredyty / Spłata rat</option>
-                        <option value="Oszczędności">Oszczędności / Inwestycje</option>
-                        <option value="Auto">Auto / Transport</option>
-                        <option value="Zdrowie">Zdrowie i Uroda</option>
-                        <option value="Inne">Inne</option>
-                    </select>
-                </div>
-
-                <button type="submit" id="saveTxBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow">Zapisz</button>
+                <input type="text" id="title" required placeholder="np. Biedronka" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
+                <input type="number" step="0.01" id="amount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
+                <select id="category" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
+                    <option value="Jedzenie">Jedzenie i Zakupy</option>
+                    <option value="Mieszkanie">Mieszkanie / Rachunki</option>
+                    <option value="Subskrypcje">Subskrypcje / Rozrywka</option>
+                    <option value="Kredyty / Raty">Kredyty / Spłata rat</option>
+                    <option value="Oszczędności">Oszczędności / Inwestycje</option>
+                    <option value="Auto">Auto / Transport</option>
+                    <option value="Zdrowie">Zdrowie i Uroda</option>
+                    <option value="Inne">Inne</option>
+                </select>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition">Zapisz</button>
             </form>
         </div>
     </div>
@@ -472,30 +415,17 @@
     <div id="transferModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-2xl p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-                <h3 class="font-bold text-base text-violet-400"><i class="fa-solid fa-vault mr-1"></i> Przelew na Konto Wspólne</h3>
-                <button onclick="closeTransferModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <h3 class="font-bold text-base text-violet-400">Przelew na Konto Wspólne</h3>
+                <button onclick="closeTransferModal()" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
             </div>
-
             <form id="transferForm" onsubmit="registerSharedTransfer(event)" class="space-y-3">
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Nadawca</label>
-                    <select id="transferFrom" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white">
-                        <option value="Szymon">Szymon ➔ Konto Wspólne</option>
-                        <option value="Aga">Aga ➔ Konto Wspólne</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Kwota (zł)</label>
-                    <input type="number" step="0.01" id="transferAmount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
-                </div>
-
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Tytuł przelewu</label>
-                    <input type="text" id="transferTitle" required value="Zasilenie konta wspólnego" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
-                </div>
-
-                <button type="submit" class="w-full bg-violet-600 hover:bg-violet-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow">Wykonaj przelew</button>
+                <select id="transferFrom" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white">
+                    <option value="Szymon">Szymon ➔ Konto Wspólne</option>
+                    <option value="Aga">Aga ➔ Konto Wspólne</option>
+                </select>
+                <input type="number" step="0.01" id="transferAmount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
+                <input type="text" id="transferTitle" required value="Zasilenie konta wspólnego" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
+                <button type="submit" class="w-full bg-violet-600 text-white font-medium py-3 rounded-xl">Wykonaj przelew</button>
             </form>
         </div>
     </div>
@@ -504,30 +434,16 @@
     <div id="payDebtModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-2xl p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-                <h3 class="font-bold text-base text-emerald-400"><i class="fa-solid fa-money-bill-transfer mr-1"></i> Rejestracja spłaty długu</h3>
-                <button onclick="closePayDebtModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <h3 class="font-bold text-base text-emerald-400">Rejestracja spłaty długu</h3>
+                <button onclick="closePayDebtModal()" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
             </div>
-
             <form id="payDebtForm" onsubmit="registerDebtPayment(event)" class="space-y-3">
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Kierunek spłaty</label>
-                    <select id="payDirection" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white">
-                        <option value="AGA_PAYS_SZYMON">Aga oddaje pieniądze Szymonowi (Aga ➔ Szymon)</option>
-                        <option value="SZYMON_PAYS_AGA">Szymon oddaje pieniądze Adze (Szymon ➔ Aga)</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Kwota (zł)</label>
-                    <input type="number" step="0.01" id="payAmount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
-                </div>
-
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Opis</label>
-                    <input type="text" id="payTitle" required value="Spłata długu / Rozliczenie" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
-                </div>
-
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow">Zarejestruj spłatę</button>
+                <select id="payDirection" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white">
+                    <option value="AGA_PAYS_SZYMON">Aga oddaje Szymonowi</option>
+                    <option value="SZYMON_PAYS_AGA">Szymon oddaje Adze</option>
+                </select>
+                <input type="number" step="0.01" id="payAmount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
+                <button type="submit" class="w-full bg-emerald-600 text-white font-medium py-3 rounded-xl">Zarejestruj spłatę</button>
             </form>
         </div>
     </div>
@@ -537,62 +453,32 @@
         <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-2xl p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
                 <h3 class="font-bold text-base">Nowa subskrypcja</h3>
-                <button onclick="closeSubModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeSubModal()" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
             </div>
-
             <form id="subForm" onsubmit="addSubscription(event)" class="space-y-3">
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Nazwa</label>
-                    <input type="text" id="subName" required placeholder="Netflix" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
-                </div>
-
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="text-xs text-gray-400 block mb-1">Kwota miesięczna (zł)</label>
-                        <input type="number" step="0.01" id="subAmount" required placeholder="43.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
-                    </div>
-                    <div>
-                        <label class="text-xs text-gray-400 block mb-1">Konto</label>
-                        <select id="subAccount" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
-                            <option value="Szymon">Szymon</option>
-                            <option value="Aga">Aga</option>
-                            <option value="Wspólne">Wspólne</option>
-                        </select>
-                    </div>
-                </div>
-
-                <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow">Dodaj subskrypcję</button>
+                <input type="text" id="subName" required placeholder="Netflix" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
+                <input type="number" step="0.01" id="subAmount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
+                <select id="subAccount" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
+                    <option value="Szymon">Szymon</option><option value="Aga">Aga</option><option value="Wspólne">Wspólne</option>
+                </select>
+                <button type="submit" class="w-full bg-sky-600 text-white font-medium py-3 rounded-xl">Dodaj subskrypcję</button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: Planner -->
+    <!-- MODAL: Planner / Limit -->
     <div id="plannerModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-2xl p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
                 <h3 class="font-bold text-base">Ustaw limit wydatków</h3>
-                <button onclick="closeBudgetPlanModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeBudgetPlanModal()" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
             </div>
-
             <form id="plannerForm" onsubmit="saveBudgetPlan(event)" class="space-y-3">
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Kategoria</label>
-                    <select id="planCategory" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
-                        <option value="Jedzenie">Jedzenie i Zakupy</option>
-                        <option value="Mieszkanie">Mieszkanie / Rachunki</option>
-                        <option value="Auto">Auto / Transport</option>
-                        <option value="Subskrypcje">Subskrypcje / Rozrywka</option>
-                        <option value="Zdrowie">Zdrowie i Uroda</option>
-                        <option value="Inne">Inne</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Maksymalny planowany limit (zł)</label>
-                    <input type="number" step="0.01" id="planLimit" required placeholder="1500.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
-                </div>
-
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow">Zapisz limit</button>
+                <select id="planCategory" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
+                    <option value="Jedzenie">Jedzenie i Zakupy</option><option value="Mieszkanie">Mieszkanie / Rachunki</option><option value="Auto">Auto / Transport</option><option value="Subskrypcje">Subskrypcje</option><option value="Zdrowie">Zdrowie</option><option value="Inne">Inne</option>
+                </select>
+                <input type="number" step="0.01" id="planLimit" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
+                <button type="submit" class="w-full bg-emerald-600 text-white font-medium py-3 rounded-xl">Zapisz limit</button>
             </form>
         </div>
     </div>
@@ -601,39 +487,26 @@
     <div id="loanModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-2xl p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-                <h3 class="font-bold text-base">Dodaj stały kredyt / ratę</h3>
-                <button onclick="closeLoanModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <h3 class="font-bold text-base">Dodaj kredyt / ratę</h3>
+                <button onclick="closeLoanModal()" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
             </div>
-
             <form id="loanForm" onsubmit="addLoan(event)" class="space-y-3">
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Nazwa kredytu / raty</label>
-                    <input type="text" id="loanName" required placeholder="np. Rata za auto" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
-                </div>
-
+                <input type="text" id="loanName" required placeholder="Rata za auto" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
                 <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="text-xs text-gray-400 block mb-1">Miesięczna rata (zł)</label>
-                        <input type="number" step="0.01" id="loanMonthly" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
-                    </div>
-                    <div>
-                        <label class="text-xs text-gray-400 block mb-1">Suma do spłaty (zł)</label>
-                        <input type="number" step="0.01" id="loanTotal" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
-                    </div>
+                    <input type="number" step="0.01" id="loanMonthly" required placeholder="Miesięczna rata" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
+                    <input type="number" step="0.01" id="loanTotal" required placeholder="Suma całkowita" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
                 </div>
-
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Dzień płatności w miesiącu</label>
-                    <input type="number" min="1" max="31" id="loanDay" required placeholder="10" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
-                </div>
-
-                <button type="submit" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow">Dodaj kredyt</button>
+                <input type="number" min="1" max="31" id="loanDay" required placeholder="Dzień płatności (np. 10)" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
+                <button type="submit" class="w-full bg-amber-600 text-white font-medium py-3 rounded-xl">Dodaj kredyt</button>
             </form>
         </div>
     </div>
 
-    <!-- Skrypty logiki -->
+    <!-- SKRYPTY LOGIKI I CHMURY JSONBIN -->
     <script>
+        const JSONBIN_API_KEY = "$2a$10$/UcaGGFAh72Ncx0DCxkvIeSRfeLVVRR8cqKKn7OZZaUw4qq0medPy";
+        let JSONBIN_ID = localStorage.getItem('budget_bin_id') || "";
+
         let transactions = [];
         let loans = [];
         let subscriptions = [];
@@ -644,183 +517,149 @@
         let currentAccount = 'Szymon';
         let chartInstance = null;
 
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
             updateHeaderTodayDate();
+            const monthInput = document.getElementById('currentMonth');
+            const now = new Date();
+            monthInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            monthInput.addEventListener('change', updateApp);
+            await syncDataFromCloud();
+        });
 
+        async function syncDataFromCloud() {
+            const statusText = document.getElementById('syncStatusText');
+            if(statusText) statusText.innerText = "Synchronizacja...";
+            try {
+                if (!JSONBIN_ID) { loadFromLocalStorage(); if(statusText) statusText.innerText = "Lokalne"; return; }
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_ID}/latest`, { headers: { 'X-Master-Key': JSONBIN_API_KEY } });
+                if (res.ok) {
+                    const data = (await res.json()).record;
+                    transactions = data.transactions || [];
+                    loans = data.loans || [];
+                    subscriptions = data.subscriptions || [];
+                    scheduleItems = data.scheduleItems || [];
+                    budgetPlans = data.budgetPlans || {};
+                    saveToLocalStorage();
+                    updateApp();
+                    if(statusText) statusText.innerText = "Zsynchronizowano";
+                } else { loadFromLocalStorage(); if(statusText) statusText.innerText = "Błąd chmury"; }
+            } catch (e) { loadFromLocalStorage(); if(statusText) statusText.innerText = "Offline"; }
+        }
+
+        async function saveToCloud() {
+            const payload = { transactions, loans, subscriptions, scheduleItems, budgetPlans };
+            saveToLocalStorage();
+            const statusText = document.getElementById('syncStatusText');
+            if(statusText) statusText.innerText = "Zapisywanie...";
+            try {
+                if (!JSONBIN_ID) {
+                    const res = await fetch('https://api.jsonbin.io/v3/b', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY },
+                        body: JSON.stringify(payload)
+                    });
+                    const d = await res.json();
+                    if (d.metadata && d.metadata.id) { JSONBIN_ID = d.metadata.id; localStorage.setItem('budget_bin_id', JSONBIN_ID); }
+                } else {
+                    await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_ID}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY },
+                        body: JSON.stringify(payload)
+                    });
+                }
+                if(statusText) statusText.innerText = "Zsynchronizowano";
+            } catch (e) { if(statusText) statusText.innerText = "Błąd zapisu"; }
+        }
+
+        function loadFromLocalStorage() {
             transactions = JSON.parse(localStorage.getItem('budget_transactions')) || [];
             loans = JSON.parse(localStorage.getItem('budget_loans')) || [];
             subscriptions = JSON.parse(localStorage.getItem('budget_subscriptions')) || [];
             scheduleItems = JSON.parse(localStorage.getItem('budget_schedule')) || [];
             budgetPlans = JSON.parse(localStorage.getItem('budget_plans')) || {};
+        }
 
-            const monthInput = document.getElementById('currentMonth');
-            const now = new Date();
-            monthInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-            monthInput.addEventListener('change', updateApp);
-
-            document.getElementById('title').addEventListener('input', function(e) {
-                const val = e.target.value.toLowerCase();
-                const categorySelect = document.getElementById('category');
-                
-                const rules = [
-                    { keywords: ['biedronka', 'lidl', 'zabka', 'żabka', 'kaufland', 'carrefour', 'aldi', 'dino', 'netto', 'spożywcze', 'jedzenie', 'market', 'sklep', 'piekarnia', 'warzywniak', 'stokrotka', 'auchan'], category: 'Jedzenie' },
-                    { keywords: ['czynsz', 'prąd', 'woda', 'gaz', 'internet', 'rachunek', 'multimedia', 'orange', 'upc', 'inea', 'tmobile', 't-mobile', 'pge', 'enea', 'tauron'], category: 'Mieszkanie' },
-                    { keywords: ['netflix', 'spotify', 'hbo', 'disney', 'youtube', 'subskrypcja', 'abonament', 'prime', 'game pass', 'steam', 'playstation', 'xbox'], category: 'Subskrypcje' },
-                    { keywords: ['paliwo', 'benzyna', 'orlen', 'shell', 'bp', 'circle k', 'moya', 'autoparking', 'parking', 'autostrada', 'mechanik', 'olej', 'opony', 'wulkanizacja'], category: 'Auto' },
-                    { keywords: ['lekarz', 'apteka', 'lek', 'kosmetyki', 'fryzjer', 'zdrowie', 'uroda', 'drogeria', 'rossmann', 'hebe', 'dentysta', 'szpital'], category: 'Zdrowie' },
-                    { keywords: ['rata', 'kredyt', 'pożyczka', 'spłata'], category: 'Kredyty / Raty' },
-                    { keywords: ['oszczędności', 'inwestycja', 'xtb', 'etf', 'skarbonka'], category: 'Oszczędności' }
-                ];
-
-                for (let rule of rules) {
-                    if (rule.keywords.some(kw => val.includes(kw))) {
-                        categorySelect.value = rule.category;
-                        break;
-                    }
-                }
-            });
-
-            updateApp();
-        });
+        function saveToLocalStorage() {
+            localStorage.setItem('budget_transactions', JSON.stringify(transactions));
+            localStorage.setItem('budget_loans', JSON.stringify(loans));
+            localStorage.setItem('budget_subscriptions', JSON.stringify(subscriptions));
+            localStorage.setItem('budget_schedule', JSON.stringify(scheduleItems));
+            localStorage.setItem('budget_plans', JSON.stringify(budgetPlans));
+        }
 
         function updateHeaderTodayDate() {
             const now = new Date();
-            const options = { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' };
-            const formatted = now.toLocaleDateString('pl-PL', options);
             const dateEl = document.getElementById('currentTodayDate');
-            if (dateEl) {
-                dateEl.innerHTML = `<i class="fa-regular fa-calendar text-[9px]"></i> Dzisiaj: ${formatted}`;
-            }
+            if (dateEl) dateEl.innerHTML = `<i class="fa-regular fa-calendar text-[9px]"></i> Dzisiaj: ${now.toLocaleDateString('pl-PL')}`;
         }
 
         function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
-        }
-
-        function closeSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            if (!sidebar.classList.contains('-translate-x-full')) {
-                sidebar.classList.add('-translate-x-full');
-                overlay.classList.add('hidden');
-            }
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            document.getElementById('sidebarOverlay').classList.toggle('hidden');
         }
 
         function switchTab(tab, fromSidebar = false) {
-            document.getElementById('tab-dashboard').classList.add('hidden');
-            document.getElementById('tab-schedule').classList.add('hidden');
-            document.getElementById('tab-debts').classList.add('hidden');
-            document.getElementById('tab-gf').classList.add('hidden');
-            document.getElementById('tab-subscriptions').classList.add('hidden');
-            document.getElementById('tab-planner').classList.add('hidden');
-            document.getElementById('tab-loans').classList.add('hidden');
-            document.getElementById('tab-savings').classList.add('hidden');
-
-            const navBtns = ['nav-dashboard', 'nav-schedule', 'nav-debts', 'nav-gf', 'nav-subscriptions', 'nav-planner', 'nav-loans', 'nav-savings'];
-            navBtns.forEach(id => {
-                const btn = document.getElementById(id);
-                if(btn) btn.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-gray-800 hover:text-white transition";
+            ['dashboard', 'schedule', 'debts', 'gf', 'subscriptions', 'planner', 'loans', 'savings'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
             });
-
-            if (tab === 'dashboard') {
-                document.getElementById('tab-dashboard').classList.remove('hidden');
-                document.getElementById('nav-dashboard').className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
-                document.getElementById('pageTitle').innerText = "Pulpit główny";
-            } else if (tab === 'schedule') {
-                document.getElementById('tab-schedule').classList.remove('hidden');
-                document.getElementById('nav-schedule').className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20";
-                document.getElementById('pageTitle').innerText = "Harmonogram spłat i opłat";
-            } else if (tab === 'debts') {
-                document.getElementById('tab-debts').classList.remove('hidden');
-                document.getElementById('nav-debts').className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20";
-                document.getElementById('pageTitle').innerText = "Rozliczenia i Długi";
-            } else if (tab === 'gf') {
-                document.getElementById('tab-gf').classList.remove('hidden');
-                document.getElementById('nav-gf').className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-pink-500/10 text-pink-400 border border-pink-500/20";
-                document.getElementById('pageTitle').innerText = "Konto Agi";
-            } else if (tab === 'subscriptions') {
-                document.getElementById('tab-subscriptions').classList.remove('hidden');
-                document.getElementById('nav-subscriptions').className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-sky-500/10 text-sky-400 border border-sky-500/20";
-                document.getElementById('pageTitle').innerText = "Subskrypcje i Stałe";
-            } else if (tab === 'planner') {
-                document.getElementById('tab-planner').classList.remove('hidden');
-                document.getElementById('nav-planner').className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
-                document.getElementById('pageTitle').innerText = "Planowane wydatki";
-            } else if (tab === 'loans') {
-                document.getElementById('tab-loans').classList.remove('hidden');
-                document.getElementById('nav-loans').className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20";
-                document.getElementById('pageTitle').innerText = "Kredyty i Raty";
-            } else if (tab === 'savings') {
-                document.getElementById('tab-savings').classList.remove('hidden');
-                document.getElementById('nav-savings').className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-sky-500/10 text-sky-400 border border-sky-500/20";
-                document.getElementById('pageTitle').innerText = "Oszczędności";
-            }
-
-            if (fromSidebar) closeSidebar();
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            if(fromSidebar) toggleSidebar();
         }
 
         function setType(type) {
             currentType = type;
-            const expBtn = document.getElementById('typeExpenseBtn');
-            const incBtn = document.getElementById('typeIncomeBtn');
-            const catContainer = document.getElementById('categoryContainer');
-
-            if (type === 'expense') {
-                expBtn.className = "py-2 rounded-xl text-[11px] font-medium border border-rose-500/50 bg-rose-500/10 text-rose-400 transition";
-                incBtn.className = "py-2 rounded-xl text-[11px] font-medium border border-gray-800 bg-gray-800 text-gray-400 transition";
-                catContainer.style.display = 'block';
-            } else {
-                incBtn.className = "py-2 rounded-xl text-[11px] font-medium border border-emerald-500/50 bg-emerald-500/10 text-emerald-400 transition";
-                expBtn.className = "py-2 rounded-xl text-[11px] font-medium border border-gray-800 bg-gray-800 text-gray-400 transition";
-                catContainer.style.display = 'none';
-            }
+            document.getElementById('typeExpenseBtn').className = type === 'expense' ? "py-2 rounded-xl text-[11px] border border-rose-500/50 bg-rose-500/10 text-rose-400" : "py-2 rounded-xl text-[11px] border border-gray-800 bg-gray-800 text-gray-400";
+            document.getElementById('typeIncomeBtn').className = type === 'income' ? "py-2 rounded-xl text-[11px] border border-emerald-500/50 bg-emerald-500/10 text-emerald-400" : "py-2 rounded-xl text-[11px] border border-gray-800 bg-gray-800 text-gray-400";
         }
 
         function setAccount(account) {
             currentAccount = account;
-            const szymonBtn = document.getElementById('accountSzymonBtn');
-            const agaBtn = document.getElementById('accountAgaBtn');
-            const sharedBtn = document.getElementById('accountSharedBtn');
-
-            szymonBtn.className = "py-2 rounded-xl text-[11px] font-medium border border-gray-800 bg-gray-800 text-gray-400 transition";
-            agaBtn.className = "py-2 rounded-xl text-[11px] font-medium border border-gray-800 bg-gray-800 text-gray-400 transition";
-            sharedBtn.className = "py-2 rounded-xl text-[11px] font-medium border border-gray-800 bg-gray-800 text-gray-400 transition";
-
-            if (account === 'Szymon') {
-                szymonBtn.className = "py-2 rounded-xl text-[11px] font-medium border border-emerald-500/50 bg-emerald-500/10 text-emerald-400 transition";
-            } else if (account === 'Aga') {
-                agaBtn.className = "py-2 rounded-xl text-[11px] font-medium border border-pink-500/50 bg-pink-500/10 text-pink-400 transition";
-            } else {
-                sharedBtn.className = "py-2 rounded-xl text-[11px] font-medium border border-violet-500/50 bg-violet-500/10 text-violet-400 transition";
-            }
+            ['Szymon', 'Aga', 'Wspólne'].forEach(acc => {
+                const btn = document.getElementById(`account${acc}Btn`);
+                if(btn) btn.className = "py-2 rounded-xl text-[11px] font-medium border border-gray-800 bg-gray-800 text-gray-400";
+            });
+            const activeBtn = document.getElementById(`account${account}Btn`);
+            if(activeBtn) activeBtn.className = `py-2 rounded-xl text-[11px] font-medium border ${account === 'Szymon' ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-400' : (account === 'Aga' ? 'border-pink-500/50 bg-pink-500/10 text-pink-400' : 'border-violet-500/50 bg-violet-500/10 text-violet-400')}`;
         }
 
         function openModal() {
             document.getElementById('editTxId').value = "";
-            document.getElementById('modalTxTitle').innerText = "Nowa transakcja";
             document.getElementById('transactionForm').reset();
             document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('debtType').value = "NONE";
             setType('expense');
             setAccount('Szymon');
             document.getElementById('transactionModal').classList.remove('hidden');
         }
-
         function openModalForGF() { openModal(); setAccount('Aga'); }
-        function closeModal() {
-            document.getElementById('transactionModal').classList.add('hidden');
-            document.getElementById('transactionForm').reset();
-            document.getElementById('editTxId').value = "";
-        }
-
-        function openTransferModal() {
-            document.getElementById('transferForm').reset();
-            document.getElementById('transferModal').classList.remove('hidden');
-        }
+        function closeModal() { document.getElementById('transactionModal').classList.add('hidden'); }
+        
+        function openTransferModal() { document.getElementById('transferModal').classList.remove('hidden'); }
         function closeTransferModal() { document.getElementById('transferModal').classList.add('hidden'); }
+        function openPayDebtModal() { document.getElementById('payDebtModal').classList.remove('hidden'); }
+        function closePayDebtModal() { document.getElementById('payDebtModal').classList.add('hidden'); }
+        function openSubModal() { document.getElementById('subModal').classList.remove('hidden'); }
+        function closeSubModal() { document.getElementById('subModal').classList.add('hidden'); }
+        function openScheduleModal() { document.getElementById('scheduleModal').classList.remove('hidden'); }
+        function closeScheduleModal() { document.getElementById('scheduleModal').classList.add('hidden'); }
+        function openBudgetPlanModal() { document.getElementById('plannerModal').classList.remove('hidden'); }
+        function closeBudgetPlanModal() { document.getElementById('plannerModal').classList.add('hidden'); }
+        function openLoanModal() { document.getElementById('loanModal').classList.remove('hidden'); }
+        function closeLoanModal() { document.getElementById('loanModal').classList.add('hidden'); }
+
+        function addOrUpdateTransaction(e) {
+            e.preventDefault();
+            const amount = parseFloat(document.getElementById('amount').value);
+            const title = document.getElementById('title').value;
+            const category = currentType === 'expense' ? document.getElementById('category').value : 'Przychód';
+            const dateVal = document.getElementById('txDate').value;
+            const debtTypeVal = document.getElementById('debtType').value;
+
+            transactions.push({ id: Date.now(), title, amount, type: currentType, account: currentAccount, category, date: dateVal, month: dateVal.substring(0, 7), debtType: debtTypeVal });
+
+            saveToCloud();
+            closeModal();
+            updateApp();
+        }
 
         function registerSharedTransfer(e) {
             e.preventDefault();
@@ -842,37 +681,23 @@
                 debtType: 'NONE'
             });
 
-            localStorage.setItem('budget_transactions', JSON.stringify(transactions));
+            saveToCloud();
             closeTransferModal();
             updateApp();
         }
-
-        function openPayDebtModal() {
-            document.getElementById('payDebtForm').reset();
-            document.getElementById('payDebtModal').classList.remove('hidden');
-        }
-        function closePayDebtModal() { document.getElementById('payDebtModal').classList.add('hidden'); }
 
         function registerDebtPayment(e) {
             e.preventDefault();
             const direction = document.getElementById('payDirection').value;
             const amount = parseFloat(document.getElementById('payAmount').value);
-            const title = document.getElementById('payTitle').value;
             const dateVal = new Date().toISOString().split('T')[0];
 
-            let payerAccount = 'Aga';
-            let receiverAccount = 'Szymon';
-            let debtTypeVal = 'AGA_PAYMENT_TO_SZYMON';
-
-            if (direction === 'SZYMON_PAYS_AGA') {
-                payerAccount = 'Szymon';
-                receiverAccount = 'Aga';
-                debtTypeVal = 'SZYMON_PAYMENT_TO_AGA';
-            }
+            let payerAccount = 'Aga', receiverAccount = 'Szymon', debtTypeVal = 'AGA_PAYMENT_TO_SZYMON';
+            if (direction === 'SZYMON_PAYS_AGA') { payerAccount = 'Szymon'; receiverAccount = 'Aga'; debtTypeVal = 'SZYMON_PAYMENT_TO_AGA'; }
 
             transactions.push({
                 id: Date.now(),
-                title: `${title} (${payerAccount} ➔ ${receiverAccount})`,
+                title: `Rozliczenie długu (${payerAccount} ➔ ${receiverAccount})`,
                 amount: amount,
                 type: 'transfer',
                 account: payerAccount,
@@ -883,157 +708,8 @@
                 debtType: debtTypeVal
             });
 
-            localStorage.setItem('budget_transactions', JSON.stringify(transactions));
+            saveToCloud();
             closePayDebtModal();
-            updateApp();
-        }
-
-        function openScheduleModal() {
-            document.getElementById('scheduleForm').reset();
-            document.getElementById('schDueDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('scheduleModal').classList.remove('hidden');
-        }
-        function closeScheduleModal() { document.getElementById('scheduleModal').classList.add('hidden'); }
-
-        function applyTemplate(type) {
-            if (type === 'czynsz') {
-                document.getElementById('schTitle').value = "Czynsz za mieszkanie";
-                document.getElementById('schMethod').value = "Przelew bankowy";
-            } else if (type === 'prad') {
-                document.getElementById('schTitle').value = "Rachunek za prąd";
-                document.getElementById('schMethod').value = "Przelew bankowy";
-            } else if (type === 'rata') {
-                document.getElementById('schTitle').value = "Rata za TV / RTV";
-                document.getElementById('schMethod').value = "Aplikacja banku";
-            } else if (type === 'internet') {
-                document.getElementById('schTitle').value = "Internet / Światłowód";
-                document.getElementById('schMethod').value = "BLIK";
-            }
-        }
-
-        function saveScheduleItem(e) {
-            e.preventDefault();
-            scheduleItems.push({
-                id: Date.now(),
-                title: document.getElementById('schTitle').value,
-                amount: parseFloat(document.getElementById('schAmount').value),
-                dueDate: document.getElementById('schDueDate').value,
-                method: document.getElementById('schMethod').value,
-                iban: document.getElementById('schIban').value,
-                recipient: document.getElementById('schRecipient').value,
-                account: document.getElementById('schAccount').value,
-                repeat: document.getElementById('schRepeat').value,
-                paid: false
-            });
-
-            localStorage.setItem('budget_schedule', JSON.stringify(scheduleItems));
-            closeScheduleModal();
-            updateApp();
-        }
-
-        function payScheduleItem(id) {
-            const item = scheduleItems.find(s => s.id === id);
-            if (!item) return;
-
-            item.paid = true;
-            const dateVal = new Date().toISOString().split('T')[0];
-
-            transactions.push({
-                id: Date.now(),
-                title: `Spłata: ${item.title}`,
-                amount: item.amount,
-                type: 'expense',
-                account: item.account,
-                category: item.title.toLowerCase().includes('czynsz') || item.title.toLowerCase().includes('prąd') ? 'Mieszkanie' : 'Kredyty / Raty',
-                date: dateVal,
-                month: dateVal.substring(0, 7),
-                debtType: 'NONE'
-            });
-
-            localStorage.setItem('budget_transactions', JSON.stringify(transactions));
-            localStorage.setItem('budget_schedule', JSON.stringify(scheduleItems));
-            updateApp();
-        }
-
-        function copyIban(iban) {
-            navigator.clipboard.writeText(iban.replace(/\s+/g, '')).then(() => {
-                alert("Numer IBAN skopiowany do schowka!");
-            });
-        }
-
-        function deleteScheduleItem(id) {
-            scheduleItems = scheduleItems.filter(s => s.id !== id);
-            localStorage.setItem('budget_schedule', JSON.stringify(scheduleItems));
-            updateApp();
-        }
-
-        function editTransaction(id) {
-            const tx = transactions.find(t => t.id === id);
-            if (!tx) return;
-
-            document.getElementById('editTxId').value = tx.id;
-            document.getElementById('modalTxTitle').innerText = "Edytuj transakcję";
-            document.getElementById('amount').value = tx.amount;
-            document.getElementById('title').value = tx.title;
-            document.getElementById('txDate').value = tx.date || new Date().toISOString().split('T')[0];
-            document.getElementById('debtType').value = tx.debtType || "NONE";
-            
-            if (tx.type === 'expense' || tx.type === 'income') {
-                document.getElementById('category').value = tx.category;
-            }
-
-            setType(tx.type === 'transfer' || tx.type === 'shared_transfer' ? 'expense' : tx.type);
-            setAccount(tx.account);
-            document.getElementById('transactionModal').classList.remove('hidden');
-        }
-
-        function openSubModal() { document.getElementById('subModal').classList.remove('hidden'); }
-        function closeSubModal() { document.getElementById('subModal').classList.add('hidden'); }
-
-        function openBudgetPlanModal() { document.getElementById('plannerModal').classList.remove('hidden'); }
-        function closeBudgetPlanModal() { document.getElementById('plannerModal').classList.add('hidden'); }
-
-        function openLoanModal() { document.getElementById('loanModal').classList.remove('hidden'); }
-        function closeLoanModal() { document.getElementById('loanModal').classList.add('hidden'); }
-
-        function addOrUpdateTransaction(e) {
-            e.preventDefault();
-            const editId = document.getElementById('editTxId').value;
-            const amount = parseFloat(document.getElementById('amount').value);
-            const title = document.getElementById('title').value;
-            const category = currentType === 'expense' ? document.getElementById('category').value : 'Przychód';
-            const dateVal = document.getElementById('txDate').value;
-            const debtTypeVal = document.getElementById('debtType').value;
-            const monthVal = dateVal.substring(0, 7);
-
-            if (editId) {
-                const index = transactions.findIndex(t => t.id == editId);
-                if (index !== -1) {
-                    transactions[index].amount = amount;
-                    transactions[index].title = title;
-                    transactions[index].type = currentType;
-                    transactions[index].account = currentAccount;
-                    transactions[index].category = category;
-                    transactions[index].date = dateVal;
-                    transactions[index].month = monthVal;
-                    transactions[index].debtType = debtTypeVal;
-                }
-            } else {
-                transactions.push({
-                    id: Date.now(),
-                    title,
-                    amount,
-                    type: currentType,
-                    account: currentAccount,
-                    category,
-                    date: dateVal,
-                    month: monthVal,
-                    debtType: debtTypeVal
-                });
-            }
-
-            localStorage.setItem('budget_transactions', JSON.stringify(transactions));
-            closeModal();
             updateApp();
         }
 
@@ -1045,46 +721,33 @@
                 amount: parseFloat(document.getElementById('subAmount').value),
                 account: document.getElementById('subAccount').value
             });
-            localStorage.setItem('budget_subscriptions', JSON.stringify(subscriptions));
+            saveToCloud();
             closeSubModal();
             updateApp();
         }
 
-        function paySubscription(subId) {
-            const sub = subscriptions.find(s => s.id === subId);
-            if (!sub) return;
-
-            const dateVal = new Date().toISOString().split('T')[0];
-
-            transactions.push({
+        function saveScheduleItem(e) {
+            e.preventDefault();
+            scheduleItems.push({
                 id: Date.now(),
-                title: `Subskrypcja: ${sub.name}`,
-                amount: sub.amount,
-                type: 'expense',
-                account: sub.account,
-                category: 'Subskrypcje',
-                date: dateVal,
-                month: dateVal.substring(0, 7),
-                debtType: 'NONE'
+                title: document.getElementById('schTitle').value,
+                amount: parseFloat(document.getElementById('schAmount').value),
+                dueDate: document.getElementById('schDueDate').value,
+                account: document.getElementById('schAccount').value,
+                method: document.getElementById('schMethod').value,
+                paid: false
             });
-
-            localStorage.setItem('budget_transactions', JSON.stringify(transactions));
-            updateApp();
-        }
-
-        function deleteSubscription(id) {
-            subscriptions = subscriptions.filter(s => s.id !== id);
-            localStorage.setItem('budget_subscriptions', JSON.stringify(subscriptions));
+            saveToCloud();
+            closeScheduleModal();
             updateApp();
         }
 
         function saveBudgetPlan(e) {
             e.preventDefault();
-            const category = document.getElementById('planCategory').value;
-            const limit = parseFloat(document.getElementById('planLimit').value);
-
-            budgetPlans[category] = limit;
-            localStorage.setItem('budget_plans', JSON.stringify(budgetPlans));
+            const cat = document.getElementById('planCategory').value;
+            const lim = parseFloat(document.getElementById('planLimit').value);
+            budgetPlans[cat] = lim;
+            saveToCloud();
             closeBudgetPlanModal();
             updateApp();
         }
@@ -1099,226 +762,118 @@
                 paid: 0,
                 day: parseInt(document.getElementById('loanDay').value)
             });
-            localStorage.setItem('budget_loans', JSON.stringify(loans));
+            saveToCloud();
             closeLoanModal();
-            updateApp();
-        }
-
-        function payLoan(loanId) {
-            const loan = loans.find(l => l.id === loanId);
-            if (!loan) return;
-
-            const dateVal = new Date().toISOString().split('T')[0];
-
-            loan.paid += loan.monthly;
-            if (loan.paid > loan.total) loan.paid = loan.total;
-            localStorage.setItem('budget_loans', JSON.stringify(loans));
-
-            transactions.push({
-                id: Date.now(),
-                title: `Spłata: ${loan.name}`,
-                amount: loan.monthly,
-                type: 'expense',
-                account: 'Szymon',
-                category: 'Kredyty / Raty',
-                date: dateVal,
-                month: dateVal.substring(0, 7),
-                debtType: 'NONE'
-            });
-            localStorage.setItem('budget_transactions', JSON.stringify(transactions));
-            updateApp();
-        }
-
-        function clearDebts() {
-            if (confirm("Czy na pewno chcesz oznaczyć wszystkie długi jako rozliczone? Przeliczenie zostanie zresetowane do 0.")) {
-                transactions.forEach(t => { if (t.debtType) t.debtType = "CLEAR"; });
-                localStorage.setItem('budget_transactions', JSON.stringify(transactions));
-                updateApp();
-            }
-        }
-
-        function deleteLoan(id) {
-            loans = loans.filter(l => l.id !== id);
-            localStorage.setItem('budget_loans', JSON.stringify(loans));
             updateApp();
         }
 
         function deleteTransaction(id) {
             transactions = transactions.filter(t => t.id !== id);
-            localStorage.setItem('budget_transactions', JSON.stringify(transactions));
+            saveToCloud();
             updateApp();
         }
 
-        function formatDateLabel(dateStr) {
-            if (!dateStr) return '';
-            const today = new Date().toISOString().split('T')[0];
-            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-
-            if (dateStr === today) return '<span class="text-emerald-400 font-semibold">Dzisiaj</span>';
-            if (dateStr === yesterday) return '<span class="text-gray-400">Wczoraj</span>';
-
-            const parts = dateStr.split('-');
-            return parts.length === 3 ? `${parts[2]}.${parts[1]}.${parts[0]}` : dateStr;
+        function clearDebts() {
+            if (confirm("Czy na pewno chcesz wyzerować długi?")) {
+                transactions.forEach(t => { if (t.debtType) t.debtType = "CLEAR"; });
+                saveToCloud();
+                updateApp();
+            }
         }
 
         function updateApp() {
-            transactions = JSON.parse(localStorage.getItem('budget_transactions')) || [];
-            loans = JSON.parse(localStorage.getItem('budget_loans')) || [];
-            subscriptions = JSON.parse(localStorage.getItem('budget_subscriptions')) || [];
-            scheduleItems = JSON.parse(localStorage.getItem('budget_schedule')) || [];
-            budgetPlans = JSON.parse(localStorage.getItem('budget_plans')) || {};
-
             const selectedMonth = document.getElementById('currentMonth').value;
             const filterAcc = document.getElementById('filterAccount').value;
-            
             const filtered = transactions.filter(t => t.month === selectedMonth);
 
-            let income = 0;
-            let expense = 0;
-            let szymonBal = 0;
-            let agaBal = 0;
-            let sharedBal = 0;
-            let netDebtVal = 0;
-
+            let income = 0, expense = 0, szymonBal = 0, agaBal = 0, sharedBal = 0, netDebtVal = 0;
+            let grandTotalSavings = 0;
             const categories = {};
-
-            const listEl = document.getElementById('transactionList');
-            const gfListEl = document.getElementById('gfTransactionList');
-            const savingsListEl = document.getElementById('savingsList');
-            const debtListEl = document.getElementById('debtTransactionList');
-            
-            listEl.innerHTML = '';
-            gfListEl.innerHTML = '';
-            savingsListEl.innerHTML = '';
-            debtListEl.innerHTML = '';
 
             transactions.forEach(t => {
                 if (t.debtType === 'SZYMON_FOR_AGA') netDebtVal += t.amount;
                 else if (t.debtType === 'AGA_FOR_SZYMON') netDebtVal -= t.amount;
-                else if (t.debtType === 'PRIV_FOR_SHARED') {
-                    if (t.account === 'Szymon') netDebtVal += (t.amount / 2);
-                    else if (t.account === 'Aga') netDebtVal -= (t.amount / 2);
-                } else if (t.debtType === 'AGA_PAYMENT_TO_SZYMON') netDebtVal -= t.amount;
+                else if (t.debtType === 'AGA_PAYMENT_TO_SZYMON') netDebtVal -= t.amount;
                 else if (t.debtType === 'SZYMON_PAYMENT_TO_AGA') netDebtVal += t.amount;
+
+                if (t.category === 'Oszczędności' && t.type === 'expense') grandTotalSavings += t.amount;
             });
+
+            if(document.getElementById('grandTotalSavings')) document.getElementById('grandTotalSavings').innerText = grandTotalSavings.toFixed(2) + ' zł';
 
             const debtBigEl = document.getElementById('debtSummaryBig');
             const debtSubEl = document.getElementById('debtDetailSub');
             const quickDebtText = document.getElementById('quickDebtText');
 
             if (netDebtVal > 0) {
-                debtBigEl.innerText = `${netDebtVal.toFixed(2)} zł`;
-                debtBigEl.className = "text-2xl font-black text-pink-400 block";
-                debtSubEl.innerText = "Aga wisi Szymonowi";
-                quickDebtText.innerHTML = `Aga wisi Szymonowi: <strong class="text-pink-400">${netDebtVal.toFixed(2)} zł</strong>`;
+                if(debtBigEl) debtBigEl.innerText = `${netDebtVal.toFixed(2)} zł`;
+                if(debtSubEl) debtSubEl.innerText = "Aga wisi Szymonowi";
+                if(quickDebtText) quickDebtText.innerHTML = `Aga wisi Szymonowi: <strong class="text-pink-400">${netDebtVal.toFixed(2)} zł</strong>`;
             } else if (netDebtVal < 0) {
-                const absVal = Math.abs(netDebtVal);
-                debtBigEl.innerText = `${absVal.toFixed(2)} zł`;
-                debtBigEl.className = "text-2xl font-black text-emerald-400 block";
-                debtSubEl.innerText = "Szymon wisi Adze";
-                quickDebtText.innerHTML = `Szymon wisi Adze: <strong class="text-emerald-400">${absVal.toFixed(2)} zł</strong>`;
+                if(debtBigEl) debtBigEl.innerText = `${Math.abs(netDebtVal).toFixed(2)} zł`;
+                if(debtSubEl) debtSubEl.innerText = "Szymon wisi Adze";
+                if(quickDebtText) quickDebtText.innerHTML = `Szymon wisi Adze: <strong class="text-emerald-400">${Math.abs(netDebtVal).toFixed(2)} zł</strong>`;
             } else {
-                debtBigEl.innerText = "0,00 zł";
-                debtBigEl.className = "text-2xl font-black text-amber-300 block";
-                debtSubEl.innerText = "Jesteście całkowicie rozliczeni!";
-                quickDebtText.innerText = "Jesteście rozliczeni na czysto (0.00 zł)";
+                if(debtBigEl) debtBigEl.innerText = "0,00 zł";
+                if(debtSubEl) debtSubEl.innerText = "Jesteście całkowicie rozliczeni!";
+                if(quickDebtText) quickDebtText.innerText = "Jesteście rozliczeni na czysto";
             }
 
-            let grandTotalSavings = 0;
-            transactions.forEach(t => {
-                if (t.category === 'Oszczędności' && t.type === 'expense') grandTotalSavings += t.amount;
-            });
-            document.getElementById('grandTotalSavings').innerText = grandTotalSavings.toFixed(2) + ' zł';
+            const listEl = document.getElementById('transactionList');
+            const gfListEl = document.getElementById('gfTransactionList');
+            const savingsListEl = document.getElementById('savingsList');
+            const debtListEl = document.getElementById('debtTransactionList');
 
-            filtered.sort((a, b) => (b.date || '').localeCompare(a.date || '') || b.id - a.id).forEach(t => {
+            if(listEl) listEl.innerHTML = '';
+            if(gfListEl) gfListEl.innerHTML = '';
+            if(savingsListEl) savingsListEl.innerHTML = '';
+            if(debtListEl) debtListEl.innerHTML = '';
+
+            filtered.sort((a, b) => (b.date || '').localeCompare(a.date || '')).forEach(t => {
                 const isIncome = t.type === 'income';
-                const isTransfer = t.type === 'transfer';
-                const isSharedTransfer = t.type === 'shared_transfer';
+                const isTransfer = t.type === 'transfer' || t.type === 'shared_transfer';
                 const val = isIncome ? t.amount : -t.amount;
 
-                if (!isTransfer && !isSharedTransfer) {
+                if (!isTransfer) {
                     if (isIncome) income += t.amount;
-                    else {
-                        expense += t.amount;
-                        categories[t.category] = (categories[t.category] || 0) + t.amount;
-                    }
+                    else { expense += t.amount; categories[t.category] = (categories[t.category] || 0) + t.amount; }
                 }
 
                 if (isTransfer) {
-                    if (t.debtType === 'AGA_PAYMENT_TO_SZYMON') { agaBal -= t.amount; szymonBal += t.amount; }
-                    else if (t.debtType === 'SZYMON_PAYMENT_TO_AGA') { szymonBal -= t.amount; agaBal += t.amount; }
-                } else if (isSharedTransfer) {
                     if (t.account === 'Szymon') szymonBal -= t.amount;
-                    else if (t.account === 'Aga') agaBal -= t.amount;
-                    sharedBal += t.amount;
+                    if (t.account === 'Aga') agaBal -= t.amount;
+                    if (t.targetAccount === 'Wspólne' || t.title.includes('Wspólne')) sharedBal += t.amount;
                 } else {
                     if (t.account === 'Aga') agaBal += val;
                     else if (t.account === 'Wspólne') sharedBal += val;
                     else szymonBal += val;
                 }
 
-                let iconClass = 'fa-arrow-up text-rose-400 bg-rose-500/10';
-                if (isIncome) iconClass = 'fa-arrow-down text-emerald-400 bg-emerald-500/10';
-                else if (isTransfer) iconClass = 'fa-money-bill-transfer text-emerald-400 bg-emerald-500/10';
-                else if (isSharedTransfer) iconClass = 'fa-vault text-violet-400 bg-violet-500/10';
-                else if (t.category === 'Kredyty / Raty') iconClass = 'fa-credit-card text-amber-400 bg-amber-500/10';
-                else if (t.category === 'Oszczędności') iconClass = 'fa-piggy-bank text-sky-400 bg-sky-500/10';
-
-                let accountBadge = '<span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-medium ml-1">Szymon</span>';
-                if (t.account === 'Aga') accountBadge = '<span class="text-[9px] bg-pink-500/20 text-pink-300 px-1.5 py-0.5 rounded font-medium ml-1">Aga</span>';
-                else if (t.account === 'Wspólne') accountBadge = '<span class="text-[9px] bg-violet-500/20 text-violet-300 px-1.5 py-0.5 rounded font-medium ml-1">Wspólne</span>';
-
-                let debtBadge = '';
-                if (t.debtType === 'SZYMON_FOR_AGA') debtBadge = '<span class="text-[9px] bg-amber-500/20 text-amber-300 px-1 py-0.5 rounded ml-1">Dług: Za Agę</span>';
-                else if (t.debtType === 'AGA_FOR_SZYMON') debtBadge = '<span class="text-[9px] bg-amber-500/20 text-amber-300 px-1 py-0.5 rounded ml-1">Dług: Za Szymona</span>';
-                else if (t.debtType === 'PRIV_FOR_SHARED') debtBadge = '<span class="text-[9px] bg-sky-500/20 text-sky-300 px-1 py-0.5 rounded ml-1">Na wspólne</span>';
-
                 const itemHtml = `
                     <div class="flex justify-between items-center bg-gray-900 border border-gray-800 p-2.5 rounded-xl text-sm">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-lg ${iconClass.split(' ')[1]} ${iconClass.split(' ')[2]} flex items-center justify-center text-xs">
-                                <i class="fa-solid ${iconClass.split(' ')[0]}"></i>
-                            </div>
-                            <div>
-                                <div class="flex items-center gap-1">
-                                    <span class="font-medium block leading-tight text-gray-200">${t.title}</span>
-                                    ${!isTransfer && !isSharedTransfer ? accountBadge : ''}
-                                    ${debtBadge}
-                                </div>
-                                <div class="flex items-center gap-2 text-[10px] text-gray-500 mt-0.5">
-                                    <span>${t.category}</span>
-                                    <span>•</span>
-                                    <span>${formatDateLabel(t.date)}</span>
-                                </div>
-                            </div>
+                        <div>
+                            <span class="font-medium text-gray-200">${t.title}</span>
+                            <span class="text-[10px] text-gray-500 block">${t.category} • ${t.date} (${t.account})</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="font-bold ${isTransfer || isSharedTransfer ? 'text-violet-400' : (isIncome ? 'text-emerald-400' : 'text-gray-200')}">
-                                ${isTransfer || isSharedTransfer ? '💸 ' : (isIncome ? '+' : '-')}${t.amount.toFixed(2)} zł
-                            </span>
-                            ${!isTransfer && !isSharedTransfer ? `<button onclick="editTransaction(${t.id})" class="text-gray-500 hover:text-amber-400 text-xs p-1"><i class="fa-solid fa-pen"></i></button>` : ''}
-                            <button onclick="deleteTransaction(${t.id})" class="text-gray-500 hover:text-rose-400 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
+                            <span class="font-bold ${isIncome ? 'text-emerald-400' : 'text-gray-200'}">${isIncome ? '+' : '-'}${t.amount.toFixed(2)} zł</span>
+                            <button onclick="deleteTransaction(${t.id})" class="text-gray-500 hover:text-rose-400 text-xs"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
                 `;
 
-                if (filterAcc === 'ALL' || t.account === filterAcc) listEl.insertAdjacentHTML('beforeend', itemHtml);
-                if (t.account === 'Aga' || t.debtType === 'AGA_PAYMENT_TO_SZYMON' || t.debtType === 'SZYMON_PAYMENT_TO_AGA') gfListEl.insertAdjacentHTML('beforeend', itemHtml);
-                if (t.debtType && t.debtType !== 'NONE' && t.debtType !== 'CLEAR') debtListEl.insertAdjacentHTML('beforeend', itemHtml);
-                if (t.category === 'Oszczędności' && t.type === 'expense') savingsListEl.insertAdjacentHTML('beforeend', itemHtml);
+                if (listEl && (filterAcc === 'ALL' || t.account === filterAcc)) listEl.insertAdjacentHTML('beforeend', itemHtml);
+                if (gfListEl && t.account === 'Aga') gfListEl.insertAdjacentHTML('beforeend', itemHtml);
+                if (savingsListEl && t.category === 'Oszczędności' && t.type === 'expense') savingsListEl.insertAdjacentHTML('beforeend', itemHtml);
+                if (debtListEl && t.debtType && t.debtType !== 'NONE' && t.debtType !== 'CLEAR') debtListEl.insertAdjacentHTML('beforeend', itemHtml);
             });
 
-            if (listEl.innerHTML === '') listEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Brak wpisów w tym miesiącu</p>';
-            if (gfListEl.innerHTML === '') gfListEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Brak wpisów na koncie Agi</p>';
-            if (debtListEl.innerHTML === '') debtListEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Brak aktywnych długów</p>';
-            if (savingsListEl.innerHTML === '') savingsListEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Brak wpisanych oszczędności</p>';
-
-            document.getElementById('totalIncome').innerText = income.toFixed(2) + ' zł';
-            document.getElementById('totalExpense').innerText = expense.toFixed(2) + ' zł';
-            document.getElementById('privateBalance').innerText = szymonBal.toFixed(2) + ' zł';
-            document.getElementById('gfBalance').innerText = agaBal.toFixed(2) + ' zł';
-            document.getElementById('gfTabBalance').innerText = agaBal.toFixed(2) + ' zł';
-            document.getElementById('sharedBalance').innerText = sharedBal.toFixed(2) + ' zł';
+            if(document.getElementById('totalIncome')) document.getElementById('totalIncome').innerText = income.toFixed(2) + ' zł';
+            if(document.getElementById('totalExpense')) document.getElementById('totalExpense').innerText = expense.toFixed(2) + ' zł';
+            if(document.getElementById('privateBalance')) document.getElementById('privateBalance').innerText = szymonBal.toFixed(2) + ' zł';
+            if(document.getElementById('gfBalance')) document.getElementById('gfBalance').innerText = agaBal.toFixed(2) + ' zł';
+            if(document.getElementById('gfTabBalance')) document.getElementById('gfTabBalance').innerText = agaBal.toFixed(2) + ' zł';
+            if(document.getElementById('sharedBalance')) document.getElementById('sharedBalance').innerText = sharedBal.toFixed(2) + ' zł';
 
             renderSubscriptions(filtered);
             renderPlanner(categories);
@@ -1329,129 +884,68 @@
 
         function renderSchedule() {
             const schEl = document.getElementById('scheduleList');
-            const quickTextEl = document.getElementById('quickScheduleText');
+            if(!schEl) return;
             schEl.innerHTML = '';
-
-            const today = new Date().toISOString().split('T')[0];
-            const activeItems = scheduleItems.filter(s => !s.paid);
-
-            if (activeItems.length > 0) {
-                activeItems.sort((a,b) => a.dueDate.localeCompare(b.dueDate));
-                const next = activeItems[0];
-                quickTextEl.innerHTML = `<strong class="text-indigo-400">${next.title}</strong>: ${next.amount.toFixed(2)} zł (do ${next.dueDate})`;
-            } else {
-                quickTextEl.innerText = "Wszystkie spłaty uregulowane!";
-            }
-
             if (scheduleItems.length === 0) {
-                schEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-6 col-span-full">Brak płatności w harmonogramie</p>';
+                schEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Brak płatności w harmonogramie</p>';
                 return;
             }
-
-            scheduleItems.sort((a,b) => a.dueDate.localeCompare(b.dueDate)).forEach(item => {
-                const isOverdue = !item.paid && item.dueDate < today;
-                const isToday = !item.paid && item.dueDate === today;
-
-                let statusBadge = `<span class="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-lg">Termin: ${item.dueDate}</span>`;
-                if (item.paid) statusBadge = `<span class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-lg"><i class="fa-solid fa-check mr-1"></i>Opłacone</span>`;
-                else if (isOverdue) statusBadge = `<span class="text-[10px] bg-rose-500/20 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded-lg font-bold"><i class="fa-solid fa-exclamation-triangle mr-1"></i>Zaległe</span>`;
-                else if (isToday) statusBadge = `<span class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-lg font-bold"><i class="fa-solid fa-clock mr-1"></i>Dzisiaj!</span>`;
-
+            scheduleItems.forEach(item => {
                 schEl.insertAdjacentHTML('beforeend', `
-                    <div class="bg-gray-900 border ${isOverdue ? 'border-rose-500/50' : 'border-gray-800'} p-3.5 rounded-2xl space-y-2.5">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <h3 class="font-bold text-sm text-gray-200">${item.title}</h3>
-                                    ${statusBadge}
-                                </div>
-                                <p class="text-xs text-indigo-400 font-bold mt-0.5">${item.amount.toFixed(2)} zł <span class="text-[10px] text-gray-500 font-normal">(${item.account})</span></p>
-                            </div>
-                            <button onclick="deleteScheduleItem(${item.id})" class="text-gray-600 hover:text-rose-400 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
+                    <div class="bg-gray-900 border border-gray-800 p-3 rounded-xl flex justify-between items-center text-xs">
+                        <div>
+                            <span class="font-bold text-gray-200">${item.title}</span>
+                            <span class="text-gray-400 block">Termin: ${item.dueDate} • ${item.amount.toFixed(2)} zł (${item.account})</span>
                         </div>
-                        <div class="bg-gray-950/60 p-2.5 rounded-xl text-xs space-y-1 text-gray-400">
-                            <div class="flex justify-between"><span>Forma:</span> <strong class="text-gray-300">${item.method}</strong></div>
-                            ${item.recipient ? `<div class="flex justify-between"><span>Odbiorca:</span> <strong class="text-gray-300">${item.recipient}</strong></div>` : ''}
-                            ${item.iban ? `
-                                <div class="flex justify-between items-center pt-1 border-t border-gray-800 mt-1">
-                                    <span class="truncate max-w-[150px] font-mono text-[11px] text-gray-300">${item.iban}</span>
-                                    <button onclick="copyIban('${item.iban}')" class="text-[10px] bg-gray-800 hover:bg-gray-700 text-indigo-300 px-2 py-0.5 rounded-lg">Kopiuj</button>
-                                </div>
-                            ` : ''}
-                        </div>
-                        ${!item.paid ? `
-                            <button onclick="payScheduleItem(${item.id})" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs py-2 rounded-xl transition shadow flex items-center justify-center gap-1.5">
-                                <i class="fa-solid fa-check"></i> Opłacone
-                            </button>
-                        ` : ''}
+                        <button onclick="deleteScheduleItem(${item.id})" class="text-gray-500 hover:text-rose-400"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 `);
             });
+        }
+
+        function deleteScheduleItem(id) {
+            scheduleItems = scheduleItems.filter(s => s.id !== id);
+            saveToCloud();
+            updateApp();
         }
 
         function renderSubscriptions(currentMonthTx) {
             const listEl = document.getElementById('subscriptionsList');
-            const quickListEl = document.getElementById('quickSubscriptionsList');
+            if(!listEl) return;
             listEl.innerHTML = '';
-            quickListEl.innerHTML = '';
-
             if (subscriptions.length === 0) {
-                listEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4 col-span-full">Brak zdefiniowanych subskrypcji</p>';
-                quickListEl.innerHTML = '<p class="text-xs text-gray-500">Brak subskrypcji</p>';
+                listEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Brak subskrypcji</p>';
                 return;
             }
-
             subscriptions.forEach(sub => {
-                const paidThisMonth = currentMonthTx.some(t => t.title === `Subskrypcja: ${sub.name}`);
-                const statusBadge = paidThisMonth 
-                    ? '<span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-md"><i class="fa-solid fa-check mr-1"></i>Opłacone</span>'
-                    : `<button onclick="paySubscription(${sub.id})" class="text-[10px] bg-sky-500/20 text-sky-400 px-2 py-1 rounded-md">Dodaj</button>`;
-
                 listEl.insertAdjacentHTML('beforeend', `
-                    <div class="flex justify-between items-center bg-gray-950/60 border border-gray-800 p-3 rounded-xl">
+                    <div class="bg-gray-950/60 border border-gray-800 p-3 rounded-xl flex justify-between items-center text-xs">
                         <div>
-                            <div class="flex items-center gap-1.5">
-                                <span class="font-semibold text-sm text-gray-200">${sub.name}</span>
-                                <span class="text-[9px] bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">${sub.account}</span>
-                            </div>
-                            <span class="text-xs text-sky-400 font-bold block mt-0.5">${sub.amount.toFixed(2)} zł / mies.</span>
+                            <span class="font-semibold text-gray-200">${sub.name}</span>
+                            <span class="text-sky-400 block">${sub.amount.toFixed(2)} zł / mies. (${sub.account})</span>
                         </div>
-                        <div class="flex items-center gap-2">
-                            ${statusBadge}
-                            <button onclick="deleteSubscription(${sub.id})" class="text-gray-600 hover:text-rose-400 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>
-                `);
-
-                quickListEl.insertAdjacentHTML('beforeend', `
-                    <div class="flex justify-between items-center py-1 border-b border-gray-800/50 last:border-0">
-                        <span class="text-gray-300">${sub.name} (${sub.amount.toFixed(2)} zł)</span>
-                        ${paidThisMonth ? '<span class="text-emerald-400"><i class="fa-solid fa-check"></i></span>' : `<button onclick="paySubscription(${sub.id})" class="text-sky-400 hover:underline">Dodaj</button>`}
+                        <button onclick="deleteSubscription(${sub.id})" class="text-gray-500 hover:text-rose-400"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 `);
             });
         }
 
+        function deleteSubscription(id) {
+            subscriptions = subscriptions.filter(s => s.id !== id);
+            saveToCloud();
+            updateApp();
+        }
+
         function renderPlanner(categories) {
             const listEl = document.getElementById('plannerList');
+            if(!listEl) return;
             listEl.innerHTML = '';
-
             ["Jedzenie", "Mieszkanie", "Auto", "Subskrypcje", "Zdrowie", "Inne"].forEach(cat => {
                 const limit = budgetPlans[cat] || 0;
                 const spent = categories[cat] || 0;
-                const percent = limit > 0 ? Math.min(100, Math.round((spent / limit) * 100)) : 0;
-                let barColor = percent > 80 ? (percent >= 100 ? 'bg-rose-500' : 'bg-amber-500') : 'bg-emerald-500';
-
                 listEl.insertAdjacentHTML('beforeend', `
-                    <div class="bg-gray-950/60 border border-gray-800 p-3 rounded-xl space-y-1.5">
-                        <div class="flex justify-between items-center text-xs">
-                            <span class="font-semibold text-gray-200">${cat}</span>
-                            <span class="text-gray-400">${spent.toFixed(2)} zł ${limit > 0 ? `/ ${limit.toFixed(2)} zł` : ''}</span>
-                        </div>
-                        ${limit > 0 ? `
-                        <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
-                            <div class="${barColor} h-full rounded-full transition-all" style="width: ${percent}%"></div>
-                        </div>` : ''}
+                    <div class="bg-gray-950/60 border border-gray-800 p-3 rounded-xl text-xs space-y-1">
+                        <div class="flex justify-between font-semibold text-gray-200"><span>${cat}</span><span>${spent.toFixed(2)} zł ${limit > 0 ? '/ ' + limit.toFixed(2) + ' zł' : ''}</span></div>
                     </div>
                 `);
             });
@@ -1459,42 +953,35 @@
 
         function renderLoans() {
             const loansEl = document.getElementById('loansList');
+            if(!loansEl) return;
             loansEl.innerHTML = '';
-
             if (loans.length === 0) {
-                loansEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4 col-span-full">Brak dodanych kredytów</p>';
+                loansEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Brak kredytów</p>';
                 return;
             }
-
             loans.forEach(loan => {
-                const percent = Math.min(100, Math.round((loan.paid / loan.total) * 100));
                 loansEl.insertAdjacentHTML('beforeend', `
-                    <div class="bg-gray-950/60 border border-gray-800 p-3.5 rounded-xl space-y-2">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h3 class="font-bold text-sm text-gray-200">${loan.name}</h3>
-                                <span class="text-[11px] text-gray-400">Płatność do: ${loan.day} dnia</span>
-                            </div>
-                            <button onclick="deleteLoan(${loan.id})" class="text-gray-500 hover:text-rose-400 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                        <div class="flex justify-between items-center text-xs mt-1">
-                            <span class="text-gray-400">Rata: <strong class="text-white">${loan.monthly.toFixed(2)} zł</strong></span>
-                            <span class="text-amber-400 font-semibold">${loan.paid.toFixed(2)} / ${loan.total.toFixed(2)} zł</span>
-                        </div>
-                        <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
-                            <div class="bg-amber-500 h-full rounded-full" style="width: ${percent}%"></div>
-                        </div>
-                        <button onclick="payLoan(${loan.id})" class="w-full mt-1 bg-amber-500/10 text-amber-400 border border-amber-500/30 text-xs py-2 rounded-xl">Opłać ratę</button>
+                    <div class="bg-gray-950/60 border border-gray-800 p-3 rounded-xl text-xs space-y-1">
+                        <div class="flex justify-between font-semibold text-gray-200"><span>${loan.name}</span><span>${loan.paid.toFixed(2)} / ${loan.total.toFixed(2)} zł</span></div>
+                        <span class="text-gray-400 block">Rata: ${loan.monthly.toFixed(2)} zł (do ${loan.day} dnia)</span>
+                        <button onclick="deleteLoan(${loan.id})" class="text-rose-400 hover:underline mt-1">Usuń kredyt</button>
                     </div>
                 `);
             });
         }
 
+        function deleteLoan(id) {
+            loans = loans.filter(l => l.id !== id);
+            saveToCloud();
+            updateApp();
+        }
+
         function updateChart(categories) {
-            const ctx = document.getElementById('expenseChart').getContext('2d');
+            const canvasEl = document.getElementById('expenseChart');
+            if(!canvasEl) return;
+            const ctx = canvasEl.getContext('2d');
             const labels = Object.keys(categories);
             const data = Object.values(categories);
-
             if (chartInstance) chartInstance.destroy();
             if (labels.length === 0) return;
 
@@ -1511,9 +998,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'right', labels: { color: '#9ca3af', boxWidth: 10, font: { size: 10 } } }
-                    }
+                    plugins: { legend: { position: 'right', labels: { color: '#9ca3af', boxWidth: 10 } } }
                 }
             });
         }
