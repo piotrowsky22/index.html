@@ -226,7 +226,7 @@
                 </div>
             </div>
 
-            <!-- Interaktywny Kalendarz Płatności -->
+            <!-- Interaktywny i Klikalny Kalendarz Płatności -->
             <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow space-y-3">
                 <div class="flex justify-between items-center">
                     <h2 class="text-xs font-semibold text-indigo-400 uppercase tracking-wider"><i class="fa-solid fa-calendar-days mr-1"></i> Kalendarz płatności</h2>
@@ -242,10 +242,11 @@
                 </div>
                 <!-- Siatka dni -->
                 <div id="calendarGrid" class="grid grid-cols-7 gap-1 text-center"></div>
+                <div class="text-[10px] text-gray-500 text-center pt-1"><i class="fa-solid fa-circle-info mr-1"></i> Kliknij w dzień, aby dodać opłatę lub w wydarzenie, aby je edytować.</div>
             </div>
 
             <div class="flex justify-between items-center pt-2">
-                <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Nadchodzące opłaty i raty</h2>
+                <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Nadchodzące opłaty, rachunki i raty</h2>
                 <button onclick="openScheduleModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 shadow">
                     <i class="fa-solid fa-plus"></i> Dodaj płatność
                 </button>
@@ -360,25 +361,27 @@
     <div id="scheduleModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-                <h3 id="schModalTitle" class="font-bold text-base text-indigo-400"><i class="fa-solid fa-calendar-plus mr-1"></i> Dodaj opłatę do harmonogramu</h3>
+                <h3 id="schModalTitle" class="font-bold text-base text-indigo-400"><i class="fa-solid fa-calendar-plus mr-1"></i> Dodaj opłatę / ratę</h3>
                 <button onclick="closeScheduleModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
             <form id="scheduleForm" onsubmit="saveScheduleItem(event)" class="space-y-3">
                 <input type="hidden" id="editSchId" value="">
+                <input type="hidden" id="isLoanItem" value="false">
+                
                 <div>
                     <label class="text-[11px] text-gray-400 block mb-1">Szybki szablon płatności:</label>
                     <div class="flex gap-1.5 overflow-x-auto pb-1">
                         <button type="button" onclick="applyTemplate('czynsz')" class="bg-gray-800 hover:bg-gray-700 text-gray-300 text-[10px] px-2.5 py-1 rounded-lg border border-gray-700 whitespace-nowrap">🏠 Czynsz</button>
                         <button type="button" onclick="applyTemplate('prad')" class="bg-gray-800 hover:bg-gray-700 text-gray-300 text-[10px] px-2.5 py-1 rounded-lg border border-gray-700 whitespace-nowrap">⚡ Prąd</button>
-                        <button type="button" onclick="applyTemplate('rata')" class="bg-gray-800 hover:bg-gray-700 text-gray-300 text-[10px] px-2.5 py-1 rounded-lg border border-gray-700 whitespace-nowrap">📺 Rata TV</button>
+                        <button type="button" onclick="applyTemplate('rata')" class="bg-gray-800 hover:bg-gray-700 text-gray-300 text-[10px] px-2.5 py-1 rounded-lg border border-gray-700 whitespace-nowrap">💳 Rata / Kredyt</button>
                         <button type="button" onclick="applyTemplate('internet')" class="bg-gray-800 hover:bg-gray-700 text-gray-300 text-[10px] px-2.5 py-1 rounded-lg border border-gray-700 whitespace-nowrap">🌐 Internet</button>
                     </div>
                 </div>
 
                 <div>
-                    <label class="text-xs text-gray-400 block mb-1">Nazwa płatności / Rachunku</label>
-                    <input type="text" id="schTitle" required placeholder="np. Czynsz, Rata TV" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
+                    <label class="text-xs text-gray-400 block mb-1">Nazwa płatności / Rachunku / Kredytu</label>
+                    <input type="text" id="schTitle" required placeholder="np. Czynsz, Rata za auto" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
@@ -399,6 +402,7 @@
                         <option value="Aplikacja banku">Aplikacja banku</option>
                         <option value="BLIK">BLIK</option>
                         <option value="Karta / Płatność automatyczna">Karta / Płatność automatyczna</option>
+                        <option value="Kredyt / Rata stała">Kredyt / Rata stała</option>
                     </select>
                 </div>
 
@@ -1070,11 +1074,12 @@
             updateApp();
         }
 
-        function openScheduleModal() {
+        function openScheduleModal(dateStr = null) {
             document.getElementById('scheduleForm').reset();
             document.getElementById('editSchId').value = "";
-            document.getElementById('schModalTitle').innerHTML = '<i class="fa-solid fa-calendar-plus mr-1"></i> Dodaj opłatę do harmonogramu';
-            document.getElementById('schDueDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('isLoanItem').value = "false";
+            document.getElementById('schModalTitle').innerHTML = '<i class="fa-solid fa-calendar-plus mr-1"></i> Dodaj opłatę / ratę';
+            document.getElementById('schDueDate').value = dateStr || new Date().toISOString().split('T')[0];
             document.getElementById('scheduleModal').classList.remove('hidden');
         }
         function closeScheduleModal() { document.getElementById('scheduleModal').classList.add('hidden'); }
@@ -1087,8 +1092,8 @@
                 document.getElementById('schTitle').value = "Rachunek za prąd";
                 document.getElementById('schMethod').value = "Przelew bankowy";
             } else if (type === 'rata') {
-                document.getElementById('schTitle').value = "Rata za TV / RTV";
-                document.getElementById('schMethod').value = "Aplikacja banku";
+                document.getElementById('schTitle').value = "Rata / Kredyt";
+                document.getElementById('schMethod').value = "Kredyt / Rata stała";
             } else if (type === 'internet') {
                 document.getElementById('schTitle').value = "Internet / Światłowód";
                 document.getElementById('schMethod').value = "BLIK";
@@ -1098,6 +1103,7 @@
         function saveScheduleItem(e) {
             e.preventDefault();
             const editId = document.getElementById('editSchId').value;
+            const isLoan = document.getElementById('isLoanItem').value === 'true';
             const title = document.getElementById('schTitle').value;
             const amount = parseFloat(document.getElementById('schAmount').value);
             const dueDate = document.getElementById('schDueDate').value;
@@ -1107,7 +1113,15 @@
             const account = document.getElementById('schAccount').value;
             const repeat = document.getElementById('schRepeat').value;
 
-            if (editId) {
+            if (isLoan) {
+                // Jeśli edytujemy element będący kredytem zaciągniętym w zakładce Kredyty
+                const loan = loans.find(l => l.id == editId);
+                if (loan) {
+                    loan.name = title;
+                    loan.monthly = amount;
+                    loan.day = parseInt(dueDate.split('-')[2]);
+                }
+            } else if (editId) {
                 const item = scheduleItems.find(s => s.id == editId);
                 if (item) {
                     item.title = title;
@@ -1139,25 +1153,50 @@
             updateApp();
         }
 
-        function editScheduleItem(id) {
-            const item = scheduleItems.find(s => s.id === id);
-            if (!item) return;
+        function editScheduleItem(id, isLoan = false) {
+            if (isLoan) {
+                const loan = loans.find(l => l.id == id);
+                if (!loan) return;
+                const currentYearMonth = calendarCurrentDate.toISOString().split('T')[0].substring(0, 7);
+                const dayStr = String(loan.day).padStart(2, '0');
 
-            document.getElementById('editSchId').value = item.id;
-            document.getElementById('schModalTitle').innerHTML = '<i class="fa-solid.fa-pen mr-1"></i> Edytuj opłatę w harmonogramie';
-            document.getElementById('schTitle').value = item.title;
-            document.getElementById('schAmount').value = item.amount;
-            document.getElementById('schDueDate').value = item.dueDate;
-            document.getElementById('schMethod').value = item.method || 'Przelew bankowy';
-            document.getElementById('schIban').value = item.iban || '';
-            document.getElementById('schRecipient').value = item.recipient || '';
-            document.getElementById('schAccount').value = item.account || 'Wspólne';
-            document.getElementById('schRepeat').value = item.repeat || 'Co miesiąc';
+                document.getElementById('editSchId').value = loan.id;
+                document.getElementById('isLoanItem').value = "true";
+                document.getElementById('schModalTitle').innerHTML = '<i class="fa-solid fa-pen mr-1"></i> Edytuj ratę kredytu';
+                document.getElementById('schTitle').value = loan.name;
+                document.getElementById('schAmount').value = loan.monthly;
+                document.getElementById('schDueDate').value = `${currentYearMonth}-${dayStr}`;
+                document.getElementById('schMethod').value = 'Kredyt / Rata stała';
+                document.getElementById('schIban').value = '';
+                document.getElementById('schRecipient').value = '';
+                document.getElementById('schAccount').value = 'Szymon';
+                document.getElementById('schRepeat').value = 'Co miesiąc';
+            } else {
+                const item = scheduleItems.find(s => s.id == id);
+                if (!item) return;
+
+                document.getElementById('editSchId').value = item.id;
+                document.getElementById('isLoanItem').value = "false";
+                document.getElementById('schModalTitle').innerHTML = '<i class="fa-solid fa-pen mr-1"></i> Edytuj płatność / rachunek';
+                document.getElementById('schTitle').value = item.title;
+                document.getElementById('schAmount').value = item.amount;
+                document.getElementById('schDueDate').value = item.dueDate;
+                document.getElementById('schMethod').value = item.method || 'Przelew bankowy';
+                document.getElementById('schIban').value = item.iban || '';
+                document.getElementById('schRecipient').value = item.recipient || '';
+                document.getElementById('schAccount').value = item.account || 'Wspólne';
+                document.getElementById('schRepeat').value = item.repeat || 'Co miesiąc';
+            }
 
             document.getElementById('scheduleModal').classList.remove('hidden');
         }
 
-        function payScheduleItem(id) {
+        function payScheduleItem(id, isLoan = false) {
+            if (isLoan) {
+                payLoan(id);
+                return;
+            }
+
             const item = scheduleItems.find(s => s.id === id);
             if (!item) return;
 
@@ -1186,7 +1225,11 @@
             });
         }
 
-        function deleteScheduleItem(id) {
+        function deleteScheduleItem(id, isLoan = false) {
+            if (isLoan) {
+                deleteLoan(id);
+                return;
+            }
             scheduleItems = scheduleItems.filter(s => s.id !== id);
             saveToCloud();
             updateApp();
@@ -1396,14 +1439,13 @@
                 const dayStr = String(loan.day).padStart(2, '0');
                 const dueDate = `${monthStr}-${dayStr}`;
                 events.push({
-                    id: `loan_${loan.id}_${monthStr}`,
+                    id: loan.id,
                     title: `Rata: ${loan.name}`,
                     amount: loan.monthly,
                     dueDate: dueDate,
                     account: 'Szymon',
-                    method: 'Kredyt',
+                    method: 'Kredyt / Rata stała',
                     isLoan: true,
-                    loanId: loan.id,
                     paid: loan.paid >= loan.total
                 });
             });
@@ -1434,7 +1476,7 @@
 
             // Puste komórki na start
             for (let i = 0; i < adjustedFirstDay; i++) {
-                grid.insertAdjacentHTML('beforeend', `<div class="h-14 bg-gray-950/20 rounded-lg opacity-30"></div>`);
+                grid.insertAdjacentHTML('beforeend', `<div class="h-16 bg-gray-950/20 rounded-xl opacity-20"></div>`);
             }
 
             for (let day = 1; day <= totalDays; day++) {
@@ -1447,16 +1489,19 @@
 
                 let eventsHtml = '';
                 dayEvents.forEach(ev => {
-                    const colorClass = ev.isLoan ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : (ev.paid ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40');
-                    eventsHtml += `<div class="text-[9px] truncate px-1 py-0.5 rounded border ${colorClass}" title="${ev.title}: ${ev.amount.toFixed(2)} zł">${ev.title.substring(0, 8)}..</div>`;
+                    const colorClass = ev.isLoan ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30' : (ev.paid ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/30' : 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40 hover:bg-indigo-500/30');
+                    eventsHtml += `<div onclick="event.stopPropagation(); editScheduleItem(${ev.id}, ${!!ev.isLoan})" class="text-[9px] truncate px-1 py-0.5 rounded border ${colorClass} cursor-pointer" title="Kliknij, aby edytować: ${ev.title}">${ev.title} (${ev.amount.toFixed(0)}zł)</div>`;
                 });
 
-                grid.insertAdjacentHTML('beforeend', `
-                    <div class="h-16 bg-gray-950/60 border ${isToday ? 'border-indigo-500 bg-indigo-950/20' : 'border-gray-800'} rounded-xl p-1 flex flex-col justify-between overflow-hidden">
-                        <span class="text-[10px] font-bold ${isToday ? 'text-indigo-400' : 'text-gray-400'}">${day}</span>
-                        <div class="space-y-0.5 overflow-y-auto max-h-10">${eventsHtml}</div>
+                grid.insertAdjacentHTML('beforeend`', `
+                    <div onclick="openScheduleModal('${dateStr}')" class="h-20 bg-gray-950/60 border ${isToday ? 'border-indigo-500 bg-indigo-950/20' : 'border-gray-800'} rounded-xl p-1 flex flex-col justify-between overflow-hidden cursor-pointer hover:border-gray-600 transition">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] font-bold ${isToday ? 'text-indigo-400' : 'text-gray-400'}">${day}</span>
+                            <i class="fa-solid fa-plus text-[8px] text-gray-600"></i>
+                        </div>
+                        <div class="space-y-0.5 overflow-y-auto max-h-12">${eventsHtml}</div>
                     </div>
-                `);
+                `.replace('`', ''));
             }
         }
 
@@ -1633,7 +1678,8 @@
             schEl.innerHTML = '';
 
             const today = new Date().toISOString().split('T')[0];
-            const activeItems = scheduleItems.filter(s => !s.paid);
+            const allEvents = getAllScheduledEvents();
+            const activeItems = allEvents.filter(s => !s.paid);
 
             if (activeItems.length > 0) {
                 activeItems.sort((a,b) => a.dueDate.localeCompare(b.dueDate));
@@ -1643,12 +1689,12 @@
                 quickTextEl.innerText = "Wszystkie spłaty uregulowane!";
             }
 
-            if (scheduleItems.length === 0) {
+            if (allEvents.length === 0) {
                 schEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-6">Brak płatności w harmonogramie</p>';
                 return;
             }
 
-            scheduleItems.sort((a,b) => a.dueDate.localeCompare(b.dueDate)).forEach(item => {
+            allEvents.sort((a,b) => a.dueDate.localeCompare(b.dueDate)).forEach(item => {
                 const isOverdue = !item.paid && item.dueDate < today;
                 const isToday = !item.paid && item.dueDate === today;
 
@@ -1662,18 +1708,18 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <div class="flex items-center gap-2">
-                                    <h3 class="font-bold text-sm text-gray-200">${item.title}</h3>
+                                    <h3 class="font-bold text-sm text-gray-200">${item.title} ${item.isLoan ? '<span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded ml-1">Kredyt</span>' : ''}</h3>
                                     ${statusBadge}
                                 </div>
                                 <p class="text-xs text-indigo-400 font-bold mt-0.5">${item.amount.toFixed(2)} zł <span class="text-[10px] text-gray-500 font-normal">(${item.account})</span></p>
                             </div>
                             <div class="flex items-center gap-1">
-                                <button onclick="editScheduleItem(${item.id})" class="text-gray-500 hover:text-amber-400 text-xs p-1.5"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="deleteScheduleItem(${item.id})" class="text-gray-600 hover:text-rose-400 text-xs p-1.5"><i class="fa-solid fa-trash"></i></button>
+                                <button onclick="editScheduleItem(${item.id}, ${!!item.isLoan})" class="text-gray-500 hover:text-amber-400 text-xs p-1.5"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteScheduleItem(${item.id}, ${!!item.isLoan})" class="text-gray-600 hover:text-rose-400 text-xs p-1.5"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </div>
                         <div class="bg-gray-950/60 p-2.5 rounded-xl text-xs space-y-1 text-gray-400">
-                            <div class="flex justify-between"><span>Forma płatności:</span> <strong class="text-gray-300">${item.method}</strong></div>
+                            <div class="flex justify-between"><span>Forma płatności:</span> <strong class="text-gray-300">${item.method || 'Przelew bankowy'}</strong></div>
                             ${item.recipient ? `<div class="flex justify-between"><span>Odbiorca / Tytuł:</span> <strong class="text-gray-300">${item.recipient}</strong></div>` : ''}
                             ${item.iban ? `
                                 <div class="flex justify-between items-center pt-1 border-t border-gray-800 mt-1">
@@ -1685,7 +1731,7 @@
                             ` : ''}
                         </div>
                         ${!item.paid ? `
-                            <button onclick="payScheduleItem(${item.id})" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs py-2 rounded-xl transition flex items-center justify-center gap-1.5 shadow">
+                            <button onclick="payScheduleItem(${item.id}, ${!!item.isLoan})" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs py-2 rounded-xl transition flex items-center justify-center gap-1.5 shadow">
                                 <i class="fa-solid fa-check"></i> Oznacz jako zapłacone
                             </button>
                         ` : ''}
@@ -1793,7 +1839,10 @@
                                 <h3 class="font-bold text-sm text-gray-200">${loan.name}</h3>
                                 <span class="text-[11px] text-gray-400">Płatność do: ${loan.day} dnia miesiąca</span>
                             </div>
-                            <button onclick="deleteLoan(${loan.id})" class="text-gray-500 hover:text-rose-400 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
+                            <div class="flex items-center gap-1">
+                                <button onclick="editScheduleItem(${loan.id}, true)" class="text-gray-500 hover:text-amber-400 text-xs p-1"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteLoan(${loan.id})" class="text-gray-500 hover:text-rose-400 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
+                            </div>
                         </div>
                         <div class="flex justify-between items-center text-xs mt-1">
                             <span class="text-gray-400">Rata: <strong class="text-white">${loan.monthly.toFixed(2)} zł</strong></span>
