@@ -75,7 +75,7 @@
         </div>
     </aside>
 
-    <!-- Naprawiony, kompaktowy nagłówek bez łamania wierszy -->
+    <!-- Nagłówek -->
     <header class="bg-gray-900 border-b border-gray-800 sticky top-0 z-40 shadow-md">
         <div class="max-w-md mx-auto px-4 py-2.5 flex justify-between items-center">
             <div class="flex items-center gap-2.5">
@@ -178,7 +178,7 @@
                 </div>
             </div>
 
-            <!-- Lista transakcji z filtrowaniem i poprawionym układem (brak zawijania badge'y) -->
+            <!-- Lista transakcji z filtrowaniem -->
             <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow space-y-3">
                 <div class="flex justify-between items-center">
                     <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Ostatnie wpisy</h2>
@@ -195,7 +195,7 @@
 
         <!-- WIDOK: HARMONOGRAM SPŁAT I OPŁAT -->
         <div id="tab-schedule" class="space-y-4 hidden">
-            <!-- Kalendarz na cały miesiąc ze wszystkimi płatnościami i ratami -->
+            <!-- Kalendarz na cały miesiąc ze wszystkimi płatnościami -->
             <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow space-y-3">
                 <div class="flex justify-between items-center">
                     <h2 class="text-xs font-semibold text-indigo-400 uppercase tracking-wider"><i class="fa-solid fa-calendar-days mr-1"></i> Kalendarz płatności</h2>
@@ -209,9 +209,9 @@
                 <div class="grid grid-cols-7 gap-1 text-center text-[10px] text-gray-400 font-semibold pb-1 border-b border-gray-800">
                     <span>Pn</span><span>Wt</span><span>Śr</span><span>Cz</span><span>Pt</span><span>So</span><span>Nd</span>
                 </div>
-                <!-- Pełna siatka całego miesiąca -->
+                <!-- Siatka całego miesiąca -->
                 <div id="calendarGrid" class="grid grid-cols-7 gap-1 text-center"></div>
-                <div class="text-[10px] text-gray-500 text-center pt-1"><i class="fa-solid fa-circle-info mr-1"></i> Kliknij w dowolny dzień, aby dodać opłatę lub w pozycję w kalendarzu, aby ją edytować.</div>
+                <div class="text-[10px] text-gray-500 text-center pt-1"><i class="fa-solid fa-circle-info mr-1"></i> Kliknij w dzień, aby dodać opłatę, lub w pozycję w kalendarzu, aby zobaczyć podgląd.</div>
             </div>
 
             <div class="flex justify-between items-center pt-2">
@@ -308,7 +308,26 @@
     </main>
 
     <!-- MODALE -->
-    <!-- MODAL: Harmonogram Spłat / Edycja -->
+    <!-- MODAL: Podgląd szczegółów płatności z kalendarza -->
+    <div id="scheduleDetailModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+                <h3 class="font-bold text-base text-indigo-400"><i class="fa-solid fa-circle-info mr-1"></i> Szczegóły płatności</h3>
+                <button onclick="closeScheduleDetailModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div id="scheduleDetailContent" class="space-y-3 text-xs text-gray-300">
+                <!-- Generowane dynamicznie -->
+            </div>
+
+            <div class="pt-2 flex gap-2">
+                <button id="detailTogglePaidBtn" onclick="" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2.5 rounded-xl transition text-xs shadow">Zmień status</button>
+                <button onclick="closeScheduleDetailModal()" class="bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2.5 rounded-xl transition text-xs">Zamknij</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Harmonogram Spłat / Edycja (tylko z dolnego spisu) -->
     <div id="scheduleModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
@@ -627,7 +646,7 @@
         </div>
     </div>
 
-    <!-- Skrypty logiki z synchronizacją JSONBin -->
+    <!-- Skrypty logiki -->
     <script>
         const JSONBIN_API_KEY = "$2a$10$/UcaGGFAh72Ncx0DCxkvIeSRfeLVVRR8cqKKn7OZZaUw4qq0medPy";
         let JSONBIN_ID = localStorage.getItem('budget_bin_id') || "";
@@ -1049,6 +1068,7 @@
         }
 
         function editScheduleItem(id, isLoan = false) {
+            closeScheduleDetailModal();
             if (isLoan) {
                 const loan = loans.find(l => l.id == id);
                 if (!loan) return;
@@ -1084,6 +1104,85 @@
             }
 
             document.getElementById('scheduleModal').classList.remove('hidden');
+        }
+
+        // Obsługa podglądu ze szczegółami po kliknięciu w kalendarzu
+        function openScheduleDetail(id, isLoan = false) {
+            const events = getAllScheduledEvents();
+            const item = events.find(e => e.id == id && !!e.isLoan === !!isLoan);
+            if (!item) return;
+
+            const detailContent = document.getElementById('scheduleDetailContent');
+            const toggleBtn = document.getElementById('detailTogglePaidBtn');
+
+            let statusText = item.paid ? '<span class="text-emerald-400 font-bold">Opłacone</span>' : '<span class="text-amber-400 font-bold">Nieopłacone</span>';
+
+            detailContent.innerHTML = `
+                <div class="bg-gray-950/60 p-3 rounded-xl space-y-2 border border-gray-800">
+                    <div class="flex justify-between"><span>Nazwa:</span> <strong class="text-white">${item.title}</strong></div>
+                    <div class="flex justify-between"><span>Kwota:</span> <strong class="text-indigo-400">${item.amount.toFixed(2)} zł</strong></div>
+                    <div class="flex justify-between"><span>Termin:</span> <strong class="text-gray-200">${item.dueDate}</strong></div>
+                    <div class="flex justify-between"><span>Status:</span> ${statusText}</div>
+                    <div class="flex justify-between"><span>Konto:</span> <strong class="text-gray-200">${item.account}</strong></div>
+                    <div class="flex justify-between"><span>Sposób zapłaty:</span> <strong class="text-gray-200">${item.method || 'Przelew bankowy'}</strong></div>
+                    ${item.recipient ? `<div class="flex justify-between"><span>Odbiorca:</span> <strong class="text-gray-200">${item.recipient}</strong></div>` : ''}
+                    ${item.iban ? `<div class="flex justify-between pt-1 border-t border-gray-800 font-mono text-[11px] text-gray-400"><span>IBAN:</span> ${item.iban}</div>` : ''}
+                </div>
+            `;
+
+            if (item.paid) {
+                toggleBtn.innerText = "Oznacz jako NIEOPŁACONE (Cofnij pomyłkę)";
+                toggleBtn.className = "w-full bg-amber-600 hover:bg-amber-500 text-white font-medium py-2.5 rounded-xl transition text-xs shadow";
+                toggleBtn.onclick = () => toggleSchedulePaidStatus(id, isLoan, false);
+            } else {
+                toggleBtn.innerText = "Oznacz jako OPŁACONE";
+                toggleBtn.className = "w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2.5 rounded-xl transition text-xs shadow";
+                toggleBtn.onclick = () => toggleSchedulePaidStatus(id, isLoan, true);
+            }
+
+            document.getElementById('scheduleDetailModal').classList.remove('hidden');
+        }
+
+        function closeScheduleDetailModal() {
+            document.getElementById('scheduleDetailModal').classList.add('hidden');
+        }
+
+        function toggleSchedulePaidStatus(id, isLoan, setPaid) {
+            if (isLoan) {
+                const loan = loans.find(l => l.id == id);
+                if (!loan) return;
+                if (setPaid) {
+                    payLoan(id);
+                } else {
+                    loan.paid -= loan.monthly;
+                    if (loan.paid < 0) loan.paid = 0;
+                    transactions = transactions.filter(t => !(t.title === `Spłata: ${loan.name}` && t.category === 'Kredyty / Raty'));
+                }
+            } else {
+                const item = scheduleItems.find(s => s.id == id);
+                if (!item) return;
+                item.paid = setPaid;
+                if (setPaid) {
+                    const dateVal = new Date().toISOString().split('T')[0];
+                    transactions.push({
+                        id: Date.now(),
+                        title: `Spłata: ${item.title}`,
+                        amount: item.amount,
+                        type: 'expense',
+                        account: item.account,
+                        category: item.title.toLowerCase().includes('czynsz') || item.title.toLowerCase().includes('prąd') ? 'Mieszkanie' : 'Kredyty / Raty',
+                        date: dateVal,
+                        month: dateVal.substring(0, 7),
+                        debtType: 'NONE'
+                    });
+                } else {
+                    transactions = transactions.filter(t => t.title !== `Spłata: ${item.title}`);
+                }
+            }
+
+            saveToCloud();
+            closeScheduleDetailModal();
+            updateApp();
         }
 
         function payScheduleItem(id, isLoan = false) {
@@ -1324,12 +1423,33 @@
             return parts.length === 3 ? `${parts[2]}.${parts[1]}.${parts[0]}` : dateStr;
         }
 
+        // Poprawka: dynamiczne generowanie opłat cyklicznych dla aktualnie przeglądanego w kalendarzu miesiąca
         function getAllScheduledEvents() {
-            let events = [...scheduleItems];
+            let events = [];
             const currentYear = calendarCurrentDate.getFullYear();
             const currentMonth = calendarCurrentDate.getMonth() + 1;
             const monthStr = `${currentYear}-${String(currentMonth).padStart(2, '0')}`;
 
+            // Przetwarzanie zaplanowanych opłat/rachunków z uwzględnieniem cykliczności (Co miesiąc)
+            scheduleItems.forEach(item => {
+                if (item.repeat === 'Co miesiąc') {
+                    // Wyciągamy dzień z oryginalnej daty
+                    const originalDay = item.dueDate ? item.dueDate.split('-')[2] : '01';
+                    const newDueDate = `${monthStr}-${originalDay}`;
+                    events.push({
+                        ...item,
+                        dueDate: newDueDate,
+                        id: item.id
+                    });
+                } else {
+                    // Jednorazowe pokazujemy tylko w ich oryginalnym miesiącu
+                    if (item.dueDate && item.dueDate.substring(0, 7) === monthStr) {
+                        events.push(item);
+                    }
+                }
+            });
+
+            // Kredyty i raty w każdym miesiącu
             loans.forEach(loan => {
                 const dayStr = String(loan.day).padStart(2, '0');
                 const dueDate = `${monthStr}-${dayStr}`;
@@ -1344,6 +1464,7 @@
                     paid: loan.paid >= loan.total
                 });
             });
+
             return events;
         }
 
@@ -1385,7 +1506,8 @@
                 let eventsHtml = '';
                 dayEvents.forEach(ev => {
                     const colorClass = ev.isLoan ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30' : (ev.paid ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/30' : 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40 hover:bg-indigo-500/30');
-                    eventsHtml += `<div onclick="event.stopPropagation(); editScheduleItem(${ev.id}, ${!!ev.isLoan})" class="text-[9px] truncate px-1 py-0.5 rounded border ${colorClass} cursor-pointer" title="Kliknij, aby edytować: ${ev.title}">${ev.title} (${ev.amount.toFixed(0)}zł)</div>`;
+                    // Kliknięcie w wydarzenie w kalendarzu otwiera teraz podgląd szczegółów (openScheduleDetail)
+                    eventsHtml += `<div onclick="event.stopPropagation(); openScheduleDetail(${ev.id}, ${!!ev.isLoan})" class="text-[9px] truncate px-1 py-0.5 rounded border ${colorClass} cursor-pointer" title="Szczegóły: ${ev.title}">${ev.title} (${ev.amount.toFixed(0)}zł)</div>`;
                 });
 
                 grid.insertAdjacentHTML('beforeend', `
@@ -1422,12 +1544,10 @@
             const categories = {};
 
             const listEl = document.getElementById('transactionList');
-            const gfListEl = document.getElementById('gfTransactionList');
             const savingsListEl = document.getElementById('savingsList');
             const debtListEl = document.getElementById('debtTransactionList');
             
             listEl.innerHTML = '';
-            if(gfListEl) gfListEl.innerHTML = '';
             savingsListEl.innerHTML = '';
             debtListEl.innerHTML = '';
 
@@ -1512,7 +1632,6 @@
                 else if (t.debtType === 'AGA_FOR_SZYMON') debtBadge = '<span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded shrink-0">Za Szymona</span>';
                 else if (t.debtType === 'PRIV_FOR_SHARED') debtBadge = '<span class="text-[9px] bg-sky-500/20 text-sky-300 px-1.5 py-0.5 rounded shrink-0">Na wspólne</span>';
 
-                // Poprawiony układ flexbox zapobiegający dziwnemu zawijaniu elementów
                 const itemHtml = `
                     <div class="flex justify-between items-center bg-gray-900 border border-gray-800 p-3 rounded-xl text-sm gap-2">
                         <div class="flex items-center gap-2.5 min-w-0 flex-1">
@@ -1607,8 +1726,9 @@
                                 <p class="text-xs text-indigo-400 font-bold mt-0.5">${item.amount.toFixed(2)} zł <span class="text-[10px] text-gray-500 font-normal">(${item.account})</span></p>
                             </div>
                             <div class="flex items-center gap-1">
-                                <button onclick="editScheduleItem(${item.id}, ${!!item.isLoan})" class="text-gray-500 hover:text-amber-400 text-xs p-1.5"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="deleteScheduleItem(${item.id}, ${!!item.isLoan})" class="text-gray-600 hover:text-rose-400 text-xs p-1.5"><i class="fa-solid fa-trash"></i></button>
+                                <!-- Edycja dostępna w dolnym spisie -->
+                                <button onclick="editScheduleItem(${item.id}, ${!!item.isLoan})" class="text-gray-500 hover:text-amber-400 text-xs p-1.5" title="Edytuj"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteScheduleItem(${item.id}, ${!!item.isLoan})" class="text-gray-600 hover:text-rose-400 text-xs p-1.5" title="Usuń"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </div>
                         <div class="bg-gray-950/60 p-2.5 rounded-xl text-xs space-y-1 text-gray-400">
@@ -1623,11 +1743,17 @@
                                 </div>
                             ` : ''}
                         </div>
-                        ${!item.paid ? `
-                            <button onclick="payScheduleItem(${item.id}, ${!!item.isLoan})" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs py-2 rounded-xl transition flex items-center justify-center gap-1.5 shadow">
-                                <i class="fa-solid fa-check"></i> Oznacz jako zapłacone
-                            </button>
-                        ` : ''}
+                        <div class="flex gap-2">
+                            ${!item.paid ? `
+                                <button onclick="payScheduleItem(${item.id}, ${!!item.isLoan})" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs py-2 rounded-xl transition flex items-center justify-center gap-1.5 shadow">
+                                    <i class="fa-solid fa-check"></i> Oznacz jako zapłacone
+                                </button>
+                            ` : `
+                                <button onclick="toggleSchedulePaidStatus(${item.id}, ${!!item.isLoan}, false)" class="w-full bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/30 font-medium text-xs py-2 rounded-xl transition flex items-center justify-center gap-1.5">
+                                    <i class="fa-solid fa-rotate-left"></i> Cofnij opłacenie (Pomyłka)
+                                </button>
+                            `}
+                        </div>
                     </div>
                 `);
             });
