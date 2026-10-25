@@ -55,9 +55,6 @@
                 <button onclick="switchTab('debts', true)" id="nav-debts" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-gray-800 hover:text-white transition">
                     <i class="fa-solid fa-hand-holding-dollar text-amber-400 w-5"></i> Rozliczenia i Długi
                 </button>
-                <button onclick="switchTab('gf', true)" id="nav-gf" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-gray-800 hover:text-white transition">
-                    <i class="fa-solid fa-heart text-pink-400 w-5"></i> Konto Agi
-                </button>
                 <button onclick="switchTab('subscriptions', true)" id="nav-subscriptions" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-gray-800 hover:text-white transition">
                     <i class="fa-solid fa-rotate-right w-5"></i> Subskrypcje i Stałe
                 </button>
@@ -78,9 +75,9 @@
         </div>
     </aside>
 
-    <!-- Nagłówek Z ZEGAREM / DZISIEJSZĄ DATĄ I STATUSEM CHMURY -->
+    <!-- Naprawiony, kompaktowy nagłówek bez łamania wierszy -->
     <header class="bg-gray-900 border-b border-gray-800 sticky top-0 z-40 shadow-md">
-        <div class="max-w-md mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="max-w-md mx-auto px-4 py-2.5 flex justify-between items-center">
             <div class="flex items-center gap-2.5">
                 <button onclick="toggleSidebar()" class="text-gray-300 hover:text-white p-1 text-lg">
                     <i class="fa-solid fa-bars"></i>
@@ -92,8 +89,8 @@
                     </span>
                 </div>
             </div>
-            <div class="flex items-center gap-2">
-                <button onclick="syncDataFromCloud()" class="text-gray-400 hover:text-emerald-400 p-1.5 bg-gray-800 border border-gray-700 rounded-lg text-xs flex items-center gap-1" title="Synchronizuj z chmurą">
+            <div class="flex items-center gap-1.5">
+                <button onclick="syncDataFromCloud()" class="text-gray-400 hover:text-emerald-400 px-2 py-1 bg-gray-800 border border-gray-700 rounded-lg text-xs flex items-center gap-1" title="Synchronizuj z chmurą">
                     <i class="fa-solid fa-cloud-arrow-down text-emerald-400"></i> <span id="syncStatusText" class="text-[10px]">Chmura</span>
                 </button>
                 <input type="month" id="currentMonth" class="bg-gray-800 text-xs border border-gray-700 rounded-lg px-2 py-1 focus:outline-none focus:border-emerald-500 text-white">
@@ -181,7 +178,7 @@
                 </div>
             </div>
 
-            <!-- Lista transakcji z filtrowaniem -->
+            <!-- Lista transakcji z filtrowaniem i poprawionym układem (brak zawijania badge'y) -->
             <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow space-y-3">
                 <div class="flex justify-between items-center">
                     <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Ostatnie wpisy</h2>
@@ -198,35 +195,7 @@
 
         <!-- WIDOK: HARMONOGRAM SPŁAT I OPŁAT -->
         <div id="tab-schedule" class="space-y-4 hidden">
-            <!-- Powiadomienia -->
-            <div class="bg-indigo-950/50 border border-indigo-500/30 p-4 rounded-2xl shadow space-y-3">
-                <div id="notifBanner" class="flex justify-between items-center border-b border-indigo-500/20 pb-3">
-                    <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-bell text-indigo-400 text-lg"></i>
-                        <div>
-                            <span class="text-xs font-bold block text-indigo-200">Powiadomienia w telefonie</span>
-                            <span class="text-[10px] text-gray-400">Otrzymuj przypomnienia na telefon</span>
-                        </div>
-                    </div>
-                    <button onclick="requestNotificationPermission()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium px-3 py-1.5 rounded-xl transition">
-                        Włącz
-                    </button>
-                </div>
-
-                <div class="flex justify-between items-center pt-1">
-                    <label for="notifTiming" class="text-xs font-medium text-gray-300 flex items-center gap-1.5">
-                        <i class="fa-solid fa-clock text-indigo-400"></i> Kiedy przypominać?
-                    </label>
-                    <select id="notifTiming" onchange="saveNotificationTiming()" class="bg-gray-900 border border-indigo-500/30 text-indigo-200 text-xs rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-indigo-400">
-                        <option value="0">W dniu płatności</option>
-                        <option value="1">1 dzień wcześniej</option>
-                        <option value="3">3 dni wcześniej</option>
-                        <option value="7">7 dni wcześniej</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Interaktywny i Klikalny Kalendarz Płatności -->
+            <!-- Kalendarz na cały miesiąc ze wszystkimi płatnościami i ratami -->
             <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow space-y-3">
                 <div class="flex justify-between items-center">
                     <h2 class="text-xs font-semibold text-indigo-400 uppercase tracking-wider"><i class="fa-solid fa-calendar-days mr-1"></i> Kalendarz płatności</h2>
@@ -240,9 +209,9 @@
                 <div class="grid grid-cols-7 gap-1 text-center text-[10px] text-gray-400 font-semibold pb-1 border-b border-gray-800">
                     <span>Pn</span><span>Wt</span><span>Śr</span><span>Cz</span><span>Pt</span><span>So</span><span>Nd</span>
                 </div>
-                <!-- Siatka dni -->
+                <!-- Pełna siatka całego miesiąca -->
                 <div id="calendarGrid" class="grid grid-cols-7 gap-1 text-center"></div>
-                <div class="text-[10px] text-gray-500 text-center pt-1"><i class="fa-solid fa-circle-info mr-1"></i> Kliknij w dzień, aby dodać opłatę lub w wydarzenie, aby je edytować.</div>
+                <div class="text-[10px] text-gray-500 text-center pt-1"><i class="fa-solid fa-circle-info mr-1"></i> Kliknij w dowolny dzień, aby dodać opłatę lub w pozycję w kalendarzu, aby ją edytować.</div>
             </div>
 
             <div class="flex justify-between items-center pt-2">
@@ -275,24 +244,6 @@
             <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow">
                 <h2 class="text-xs font-semibold text-amber-400 mb-3 uppercase tracking-wider">Historia długów i spłat</h2>
                 <div id="debtTransactionList" class="space-y-2.5 max-h-80 overflow-y-auto pr-1"></div>
-            </div>
-        </div>
-
-        <!-- WIDOK: KONTO AGI -->
-        <div id="tab-gf" class="space-y-4 hidden">
-            <div class="bg-gradient-to-br from-pink-950/40 to-gray-900 border border-pink-500/30 p-5 rounded-2xl shadow flex justify-between items-center">
-                <div>
-                    <span class="text-xs text-pink-400 font-medium block"><i class="fa-solid fa-heart mr-1"></i> Saldo Agi</span>
-                    <span id="gfTabBalance" class="text-2xl font-black text-pink-300 mt-1 block">0,00 zł</span>
-                </div>
-                <button onclick="openModalForGF()" class="bg-pink-600 hover:bg-pink-500 text-white text-xs font-semibold px-3 py-2 rounded-xl transition shadow">
-                    <i class="fa-solid fa-plus mr-1"></i> Dodaj wpis Agi
-                </button>
-            </div>
-
-            <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow">
-                <h2 class="text-xs font-semibold text-pink-400 mb-3 uppercase tracking-wider">Prywatne transakcje Agi</h2>
-                <div id="gfTransactionList" class="space-y-2.5 max-h-80 overflow-y-auto pr-1"></div>
             </div>
         </div>
 
@@ -700,16 +651,6 @@
             monthInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
             monthInput.addEventListener('change', updateApp);
 
-            const savedTiming = localStorage.getItem('budget_notif_timing') || "0";
-            const timingSelect = document.getElementById('notifTiming');
-            if (timingSelect) timingSelect.value = savedTiming;
-
-            if ("Notification" in window && Notification.permission === "granted") {
-                const banner = document.getElementById('notifBanner');
-                if (banner) banner.style.display = 'none';
-                checkNotificationAlerts();
-            }
-
             document.getElementById('title').addEventListener('input', function(e) {
                 const val = e.target.value.toLowerCase();
                 const categorySelect = document.getElementById('category');
@@ -840,45 +781,6 @@
             }
         }
 
-        function saveNotificationTiming() {
-            const val = document.getElementById('notifTiming').value;
-            localStorage.setItem('budget_notif_timing', val);
-            checkNotificationAlerts();
-        }
-
-        function requestNotificationPermission() {
-            if (!("Notification" in window)) {
-                alert("Twoja przeglądarka nie obsługuje powiadomień.");
-                return;
-            }
-            Notification.requestPermission().then(permission => {
-                if (permission === "granted") {
-                    const banner = document.getElementById('notifBanner');
-                    if (banner) banner.style.display = 'none';
-                    new Notification("Budżet Domowy", { body: "Powiadomienia o płatnościach zostały włączone!" });
-                    checkNotificationAlerts();
-                }
-            });
-        }
-
-        function checkNotificationAlerts() {
-            if (!("Notification" in window) || Notification.permission !== "granted") return;
-
-            const daysBefore = parseInt(localStorage.getItem('budget_notif_timing') || "0");
-            const targetDate = new Date();
-            targetDate.setDate(targetDate.getDate() + daysBefore);
-            const targetDateStr = targetDate.toISOString().split('T')[0];
-
-            getAllScheduledEvents().forEach(item => {
-                if (item.dueDate === targetDateStr && !item.paid) {
-                    let timingText = daysBefore === 0 ? "dzisiaj" : (daysBefore === 1 ? "jutro" : `za ${daysBefore} dni`);
-                    new Notification("Przypomnienie o płatności!", {
-                        body: `Płatność ${item.title} (${item.amount.toFixed(2)} zł) mija ${timingText}!`
-                    });
-                }
-            });
-        }
-
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
@@ -899,13 +801,12 @@
             document.getElementById('tab-dashboard').classList.add('hidden');
             document.getElementById('tab-schedule').classList.add('hidden');
             document.getElementById('tab-debts').classList.add('hidden');
-            document.getElementById('tab-gf').classList.add('hidden');
             document.getElementById('tab-subscriptions').classList.add('hidden');
             document.getElementById('tab-planner').classList.add('hidden');
             document.getElementById('tab-loans').classList.add('hidden');
             document.getElementById('tab-savings').classList.add('hidden');
 
-            const navBtns = ['nav-dashboard', 'nav-schedule', 'nav-debts', 'nav-gf', 'nav-subscriptions', 'nav-planner', 'nav-loans', 'nav-savings'];
+            const navBtns = ['nav-dashboard', 'nav-schedule', 'nav-debts', 'nav-subscriptions', 'nav-planner', 'nav-loans', 'nav-savings'];
             navBtns.forEach(id => {
                 const btn = document.getElementById(id);
                 if(btn) btn.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-gray-800 hover:text-white transition";
@@ -923,10 +824,6 @@
                 document.getElementById('tab-debts').classList.remove('hidden');
                 document.getElementById('nav-debts').className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20";
                 document.getElementById('pageTitle').innerText = "Rozliczenia i Długi";
-            } else if (tab === 'gf') {
-                document.getElementById('tab-gf').classList.remove('hidden');
-                document.getElementById('nav-gf').className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-pink-500/10 text-pink-400 border border-pink-500/20";
-                document.getElementById('pageTitle').innerText = "Konto Agi";
             } else if (tab === 'subscriptions') {
                 document.getElementById('tab-subscriptions').classList.remove('hidden');
                 document.getElementById('nav-subscriptions').className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-sky-500/10 text-sky-400 border border-sky-500/20";
@@ -995,7 +892,6 @@
             document.getElementById('transactionModal').classList.remove('hidden');
         }
 
-        function openModalForGF() { openModal(); setAccount('Aga'); }
         function closeModal() {
             document.getElementById('transactionModal').classList.add('hidden');
             document.getElementById('transactionForm').reset();
@@ -1114,7 +1010,6 @@
             const repeat = document.getElementById('schRepeat').value;
 
             if (isLoan) {
-                // Jeśli edytujemy element będący kredytem zaciągniętym w zakładce Kredyty
                 const loan = loans.find(l => l.id == editId);
                 if (loan) {
                     loan.name = title;
@@ -1474,7 +1369,7 @@
 
             const events = getAllScheduledEvents();
 
-            // Puste komórki na start
+            // Puste komórki przed pierwszym dniem miesiąca
             for (let i = 0; i < adjustedFirstDay; i++) {
                 grid.insertAdjacentHTML('beforeend', `<div class="h-16 bg-gray-950/20 rounded-xl opacity-20"></div>`);
             }
@@ -1493,7 +1388,7 @@
                     eventsHtml += `<div onclick="event.stopPropagation(); editScheduleItem(${ev.id}, ${!!ev.isLoan})" class="text-[9px] truncate px-1 py-0.5 rounded border ${colorClass} cursor-pointer" title="Kliknij, aby edytować: ${ev.title}">${ev.title} (${ev.amount.toFixed(0)}zł)</div>`;
                 });
 
-                grid.insertAdjacentHTML('beforeend`', `
+                grid.insertAdjacentHTML('beforeend', `
                     <div onclick="openScheduleModal('${dateStr}')" class="h-20 bg-gray-950/60 border ${isToday ? 'border-indigo-500 bg-indigo-950/20' : 'border-gray-800'} rounded-xl p-1 flex flex-col justify-between overflow-hidden cursor-pointer hover:border-gray-600 transition">
                         <div class="flex justify-between items-center">
                             <span class="text-[10px] font-bold ${isToday ? 'text-indigo-400' : 'text-gray-400'}">${day}</span>
@@ -1501,7 +1396,7 @@
                         </div>
                         <div class="space-y-0.5 overflow-y-auto max-h-12">${eventsHtml}</div>
                     </div>
-                `.replace('`', ''));
+                `);
             }
         }
 
@@ -1532,7 +1427,7 @@
             const debtListEl = document.getElementById('debtTransactionList');
             
             listEl.innerHTML = '';
-            gfListEl.innerHTML = '';
+            if(gfListEl) gfListEl.innerHTML = '';
             savingsListEl.innerHTML = '';
             debtListEl.innerHTML = '';
 
@@ -1608,24 +1503,25 @@
                 else if (t.category === 'Kredyty / Raty') iconClass = 'fa-credit-card text-amber-400 bg-amber-500/10';
                 else if (t.category === 'Oszczędności') iconClass = 'fa-piggy-bank text-sky-400 bg-sky-500/10';
 
-                let accountBadge = '<span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-medium ml-1">Szymon</span>';
-                if (t.account === 'Aga') accountBadge = '<span class="text-[9px] bg-pink-500/20 text-pink-300 px-1.5 py-0.5 rounded font-medium ml-1">Aga</span>';
-                else if (t.account === 'Wspólne') accountBadge = '<span class="text-[9px] bg-violet-500/20 text-violet-300 px-1.5 py-0.5 rounded font-medium ml-1">Wspólne</span>';
+                let accountBadge = '<span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-medium shrink-0">Szymon</span>';
+                if (t.account === 'Aga') accountBadge = '<span class="text-[9px] bg-pink-500/20 text-pink-300 px-1.5 py-0.5 rounded font-medium shrink-0">Aga</span>';
+                else if (t.account === 'Wspólne') accountBadge = '<span class="text-[9px] bg-violet-500/20 text-violet-300 px-1.5 py-0.5 rounded font-medium shrink-0">Wspólne</span>';
 
                 let debtBadge = '';
-                if (t.debtType === 'SZYMON_FOR_AGA') debtBadge = '<span class="text-[9px] bg-amber-500/20 text-amber-300 px-1 py-0.5 rounded ml-1">Dług: Za Agę</span>';
-                else if (t.debtType === 'AGA_FOR_SZYMON') debtBadge = '<span class="text-[9px] bg-amber-500/20 text-amber-300 px-1 py-0.5 rounded ml-1">Dług: Za Szymona</span>';
-                else if (t.debtType === 'PRIV_FOR_SHARED') debtBadge = '<span class="text-[9px] bg-sky-500/20 text-sky-300 px-1 py-0.5 rounded ml-1">Na wspólne</span>';
+                if (t.debtType === 'SZYMON_FOR_AGA') debtBadge = '<span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded shrink-0">Za Agę</span>';
+                else if (t.debtType === 'AGA_FOR_SZYMON') debtBadge = '<span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded shrink-0">Za Szymona</span>';
+                else if (t.debtType === 'PRIV_FOR_SHARED') debtBadge = '<span class="text-[9px] bg-sky-500/20 text-sky-300 px-1.5 py-0.5 rounded shrink-0">Na wspólne</span>';
 
+                // Poprawiony układ flexbox zapobiegający dziwnemu zawijaniu elementów
                 const itemHtml = `
-                    <div class="flex justify-between items-center bg-gray-900 border border-gray-800 p-2.5 rounded-xl text-sm">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-lg ${iconClass.split(' ')[1]} ${iconClass.split(' ')[2]} flex items-center justify-center text-xs">
+                    <div class="flex justify-between items-center bg-gray-900 border border-gray-800 p-3 rounded-xl text-sm gap-2">
+                        <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                            <div class="w-8 h-8 rounded-lg ${iconClass.split(' ')[1]} ${iconClass.split(' ')[2]} flex items-center justify-center text-xs shrink-0">
                                 <i class="fa-solid ${iconClass.split(' ')[0]}"></i>
                             </div>
-                            <div>
-                                <div class="flex items-center gap-1">
-                                    <span class="font-medium block leading-tight text-gray-200">${t.title}</span>
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <span class="font-medium text-gray-200 truncate">${t.title}</span>
                                     ${!isTransfer && !isSharedTransfer ? accountBadge : ''}
                                     ${debtBadge}
                                 </div>
@@ -1636,8 +1532,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="font-bold ${isTransfer || isSharedTransfer ? 'text-violet-400' : (isIncome ? 'text-emerald-400' : 'text-gray-200')}">
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span class="font-bold text-xs sm:text-sm ${isTransfer || isSharedTransfer ? 'text-violet-400' : (isIncome ? 'text-emerald-400' : 'text-gray-200')}">
                                 ${isTransfer || isSharedTransfer ? '💸 ' : (isIncome ? '+' : '-')}${t.amount.toFixed(2)} zł
                             </span>
                             ${!isTransfer && !isSharedTransfer ? `<button onclick="editTransaction(${t.id})" class="text-gray-500 hover:text-amber-400 text-xs p-1"><i class="fa-solid fa-pen"></i></button>` : ''}
@@ -1647,13 +1543,11 @@
                 `;
 
                 if (filterAcc === 'ALL' || t.account === filterAcc) listEl.insertAdjacentHTML('beforeend', itemHtml);
-                if (t.account === 'Aga' || t.debtType === 'AGA_PAYMENT_TO_SZYMON' || t.debtType === 'SZYMON_PAYMENT_TO_AGA') gfListEl.insertAdjacentHTML('beforeend', itemHtml);
                 if (t.debtType && t.debtType !== 'NONE' && t.debtType !== 'CLEAR') debtListEl.insertAdjacentHTML('beforeend', itemHtml);
                 if (t.category === 'Oszczędności' && t.type === 'expense') savingsListEl.insertAdjacentHTML('beforeend', itemHtml);
             });
 
             if (listEl.innerHTML === '') listEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Brak wpisów w tym miesiącu</p>';
-            if (gfListEl.innerHTML === '') gfListEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Brak wpisów na koncie Agi</p>';
             if (debtListEl.innerHTML === '') debtListEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Brak aktywnych długów</p>';
             if (savingsListEl.innerHTML === '') savingsListEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Brak wpisanych oszczędności</p>';
 
@@ -1661,7 +1555,6 @@
             document.getElementById('totalExpense').innerText = expense.toFixed(2) + ' zł';
             document.getElementById('privateBalance').innerText = szymonBal.toFixed(2) + ' zł';
             document.getElementById('gfBalance').innerText = agaBal.toFixed(2) + ' zł';
-            document.getElementById('gfTabBalance').innerText = agaBal.toFixed(2) + ' zł';
             document.getElementById('sharedBalance').innerText = sharedBal.toFixed(2) + ' zł';
 
             renderSubscriptions(filtered);
@@ -1707,7 +1600,7 @@
                     <div class="bg-gray-900 border ${isOverdue ? 'border-rose-500/50' : 'border-gray-800'} p-3.5 rounded-2xl space-y-2.5">
                         <div class="flex justify-between items-start">
                             <div>
-                                <div class="flex items-center gap-2">
+                                <div class="flex items-center gap-2 flex-wrap">
                                     <h3 class="font-bold text-sm text-gray-200">${item.title} ${item.isLoan ? '<span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded ml-1">Kredyt</span>' : ''}</h3>
                                     ${statusBadge}
                                 </div>
