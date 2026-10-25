@@ -90,10 +90,6 @@
                 </div>
             </div>
             <div class="flex items-center gap-1.5">
-                <!-- Tymczasowy przycisk do pokazywania ID -->
-                <button onclick="showMyBinId()" class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-1 rounded-lg" title="Pokaż ID binu w chmurze">
-                    🔑 ID
-                </button>
                 <button onclick="syncDataFromCloud()" class="text-gray-400 hover:text-emerald-400 px-2 py-1 bg-gray-800 border border-gray-700 rounded-lg text-xs flex items-center gap-1" title="Synchronizuj z chmurą">
                     <i class="fa-solid fa-cloud-arrow-down text-emerald-400"></i> <span id="syncStatusText" class="text-[10px]">Chmura</span>
                 </button>
@@ -312,19 +308,6 @@
     </main>
 
     <!-- MODALE -->
-    <!-- MODAL: Podgląd ID Binu w chmurze -->
-    <div id="binIdModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-gray-900 border border-gray-800 w-full max-w-sm rounded-2xl p-5 space-y-4 shadow-2xl text-center">
-            <h3 class="font-bold text-base text-amber-400"><i class="fa-solid fa-key mr-1"></i> ID Twojej Chmury (JSONBin)</h3>
-            <p class="text-xs text-gray-400">Skopiuj to ID i wklej u Agi do kodu, albo przepisz do zmiennej <code class="text-indigo-300">JSONBIN_ID</code>.</p>
-            <input type="text" id="binIdDisplayInput" readonly class="w-full bg-gray-950 border border-gray-700 rounded-xl px-3 py-2 text-xs text-emerald-400 text-center font-mono select-all">
-            <div class="flex gap-2 pt-2">
-                <button onclick="copyBinIdToClipboard()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2 rounded-xl transition text-xs shadow">Kopiuj do schowka</button>
-                <button onclick="closeBinIdModal()" class="bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-xl transition text-xs">Zamknij</button>
-            </div>
-        </div>
-    </div>
-
     <!-- MODAL: Podgląd szczegółów płatności z kalendarza -->
     <div id="scheduleDetailModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4 shadow-2xl">
@@ -664,7 +647,7 @@
     <!-- Skrypty logiki -->
     <script>
         const JSONBIN_API_KEY = "$2a$10$/UcaGGFAh72Ncx0DCxkvIeSRfeLVVRR8cqKKn7OZZaUw4qq0medPy";
-        let JSONBIN_ID = localStorage.getItem('budget_bin_id') || "";
+        let JSONBIN_ID = "6ade519dac6210605a51639a";
 
         let transactions = [];
         let loans = [];
@@ -709,33 +692,6 @@
 
             await syncDataFromCloud();
         });
-
-        // Funkcja wyświetlająca modal z ID binu
-        function showMyBinId() {
-            if (!JSONBIN_ID) {
-                // Jeśli jeszcze nie ma, wymusimy stworzenie i zapis
-                saveToCloud().then(() => {
-                    document.getElementById('binIdDisplayInput').value = JSONBIN_ID || "Brak ID (zapisz coś do chmury)";
-                    document.getElementById('binIdModal').classList.remove('hidden');
-                });
-            } else {
-                document.getElementById('binIdDisplayInput').value = JSONBIN_ID;
-                document.getElementById('binIdModal').classList.remove('hidden');
-            }
-        }
-
-        function closeBinIdModal() {
-            document.getElementById('binIdModal').classList.add('hidden');
-        }
-
-        function copyBinIdToClipboard() {
-            const input = document.getElementById('binIdDisplayInput');
-            input.select();
-            input.setSelectionRange(0, 99999);
-            navigator.clipboard.writeText(input.value).then(() => {
-                alert("ID skopiowane do schowka! Wyślij je Adze lub wklej w kodzie.");
-            });
-        }
 
         async function syncDataFromCloud() {
             const statusText = document.getElementById('syncStatusText');
