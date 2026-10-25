@@ -78,15 +78,15 @@
         </div>
     </aside>
 
-    <!-- Nagłówek Z ZEGAREM / DZISIEJSZĄ DATĄ -->
+    <!-- Nagłówek -->
     <header class="bg-gray-900 border-b border-gray-800 sticky top-0 z-40 shadow-md">
-        <div class="max-w-md mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-2.5">
                 <button onclick="toggleSidebar()" class="text-gray-300 hover:text-white p-1 text-lg">
                     <i class="fa-solid fa-bars"></i>
                 </button>
                 <div>
-                    <h1 id="pageTitle" class="text-sm font-bold leading-tight">Pulpit główny</h1>
+                    <h1 id="pageTitle" class="text-sm sm:text-base font-bold leading-tight">Pulpit główny</h1>
                     <span id="currentTodayDate" class="text-[10px] text-emerald-400 font-medium flex items-center gap-1">
                         <i class="fa-regular fa-calendar text-[9px]"></i> Dzisiaj: ...
                     </span>
@@ -101,87 +101,95 @@
         </div>
     </header>
 
-    <main class="max-w-md mx-auto px-4 mt-4 space-y-4">
+    <!-- Główna zawartość elastyczna (wąska na mobile, szeroka na PC) -->
+    <main class="max-w-4xl mx-auto px-4 mt-4 space-y-4">
 
         <!-- WIDOK: PULPIT GŁÓWNY -->
         <div id="tab-dashboard" class="space-y-4">
             
             <!-- Salda 3 kont -->
-            <div class="grid grid-cols-3 gap-2">
-                <div class="bg-gray-900 border border-gray-800 p-2.5 rounded-2xl shadow">
-                    <span class="text-[10px] text-gray-400 block truncate"><i class="fa-solid fa-user text-emerald-400 mr-1"></i> Szymon</span>
-                    <span id="privateBalance" class="text-xs sm:text-sm font-bold text-emerald-400 mt-1 block">0,00 zł</span>
+            <div class="grid grid-cols-3 gap-2 sm:gap-4">
+                <div class="bg-gray-900 border border-gray-800 p-3 sm:p-4 rounded-2xl shadow">
+                    <span class="text-[10px] sm:text-xs text-gray-400 block truncate"><i class="fa-solid fa-user text-emerald-400 mr-1"></i> Szymon</span>
+                    <span id="privateBalance" class="text-xs sm:text-lg font-bold text-emerald-400 mt-1 block">0,00 zł</span>
                 </div>
-                <div class="bg-gray-900 border border-gray-800 p-2.5 rounded-2xl shadow">
-                    <span class="text-[10px] text-gray-400 block truncate"><i class="fa-solid fa-heart text-pink-400 mr-1"></i> Aga</span>
-                    <span id="gfBalance" class="text-xs sm:text-sm font-bold text-pink-400 mt-1 block">0,00 zł</span>
+                <div class="bg-gray-900 border border-gray-800 p-3 sm:p-4 rounded-2xl shadow">
+                    <span class="text-[10px] sm:text-xs text-gray-400 block truncate"><i class="fa-solid fa-heart text-pink-400 mr-1"></i> Aga</span>
+                    <span id="gfBalance" class="text-xs sm:text-lg font-bold text-pink-400 mt-1 block">0,00 zł</span>
                 </div>
-                <div class="bg-gray-900 border border-gray-800 p-2.5 rounded-2xl shadow">
-                    <span class="text-[10px] text-gray-400 block truncate"><i class="fa-solid fa-users text-violet-400 mr-1"></i> Wspólne</span>
-                    <span id="sharedBalance" class="text-xs sm:text-sm font-bold text-violet-400 mt-1 block">0,00 zł</span>
+                <div class="bg-gray-900 border border-gray-800 p-3 sm:p-4 rounded-2xl shadow">
+                    <span class="text-[10px] sm:text-xs text-gray-400 block truncate"><i class="fa-solid fa-users text-violet-400 mr-1"></i> Wspólne</span>
+                    <span id="sharedBalance" class="text-xs sm:text-lg font-bold text-violet-400 mt-1 block">0,00 zł</span>
                 </div>
             </div>
 
-            <!-- Przycisk przelewu na konto wspólne -->
-            <button onclick="openTransferModal()" class="w-full bg-gradient-to-r from-violet-900/40 to-gray-900 border border-violet-500/30 hover:border-violet-500/50 text-violet-300 font-medium py-2.5 px-4 rounded-xl transition text-xs flex items-center justify-center gap-2 shadow">
+            <!-- Przelew na konto wspólne -->
+            <button onclick="openTransferModal()" class="w-full bg-gradient-to-r from-violet-900/40 to-gray-900 border border-violet-500/30 hover:border-violet-500/50 text-violet-300 font-medium py-3 px-4 rounded-xl transition text-xs sm:text-sm flex items-center justify-center gap-2 shadow">
                 <i class="fa-solid fa-vault text-violet-400"></i> Przelew z prywatnego na Konto Wspólne
             </button>
 
-            <!-- Baner spłat nadchodzących w harmonogramie -->
-            <div id="quickScheduleWidget" onclick="switchTab('schedule', false)" class="bg-gradient-to-r from-indigo-950/40 to-gray-900 border border-indigo-500/30 p-3.5 rounded-2xl shadow flex justify-between items-center cursor-pointer hover:border-indigo-500/60 transition">
-                <div>
-                    <span class="text-[11px] text-indigo-400 font-semibold block uppercase tracking-wider"><i class="fa-solid fa-calendar-check mr-1"></i> Najbliższa spłata / opłata</span>
-                    <span id="quickScheduleText" class="text-xs font-medium text-gray-300 mt-0.5 block">Brak zaplanowanych spłat</span>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Lewa kolumna na PC -->
+                <div class="space-y-4">
+                    <!-- Baner spłat nadchodzących -->
+                    <div id="quickScheduleWidget" onclick="switchTab('schedule', false)" class="bg-gradient-to-r from-indigo-950/40 to-gray-900 border border-indigo-500/30 p-3.5 rounded-2xl shadow flex justify-between items-center cursor-pointer hover:border-indigo-500/60 transition">
+                        <div>
+                            <span class="text-[11px] text-indigo-400 font-semibold block uppercase tracking-wider"><i class="fa-solid fa-calendar-check mr-1"></i> Najbliższa spłata / opłata</span>
+                            <span id="quickScheduleText" class="text-xs font-medium text-gray-300 mt-0.5 block">Brak zaplanowanych spłat</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-indigo-400 text-xs"></i>
+                    </div>
+
+                    <!-- Moduł długów -->
+                    <div id="quickDebtWidget" class="bg-gradient-to-r from-amber-950/40 to-gray-900 border border-amber-500/30 p-3.5 rounded-2xl shadow flex justify-between items-center">
+                        <div>
+                            <span class="text-[11px] text-amber-400 font-semibold block uppercase tracking-wider"><i class="fa-solid fa-scale-balanced mr-1"></i> Wzajemne rozliczenie</span>
+                            <span id="quickDebtText" class="text-sm font-bold text-gray-200 mt-0.5 block">Jesteście rozliczeni (0.00 zł)</span>
+                        </div>
+                        <button onclick="switchTab('debts', false)" class="text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1.5 rounded-xl hover:bg-amber-500/30 transition font-medium">
+                            Szczegóły
+                        </button>
+                    </div>
+
+                    <!-- Podsumowanie -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-gray-900 border border-gray-800 p-3 rounded-xl">
+                            <span class="text-[11px] text-gray-400 block"><i class="fa-solid fa-arrow-trend-up text-emerald-500 mr-1"></i> Przychody razem</span>
+                            <span id="totalIncome" class="text-sm sm:text-base font-bold text-emerald-400 mt-0.5 block">0,00 zł</span>
+                        </div>
+                        <div class="bg-gray-900 border border-gray-800 p-3 rounded-xl">
+                            <span class="text-[11px] text-gray-400 block"><i class="fa-solid fa-arrow-trend-down text-rose-500 mr-1"></i> Wydatki razem</span>
+                            <span id="totalExpense" class="text-sm sm:text-base font-bold text-rose-400 mt-0.5 block">0,00 zł</span>
+                        </div>
+                    </div>
+
+                    <button onclick="openModal()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 px-4 rounded-2xl transition shadow-lg shadow-emerald-900/20 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Dodaj transakcję
+                    </button>
                 </div>
-                <i class="fa-solid fa-chevron-right text-indigo-400 text-xs"></i>
+
+                <!-- Prawa kolumna na PC -->
+                <div class="space-y-4">
+                    <!-- Wykres -->
+                    <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow">
+                        <h2 class="text-xs font-semibold text-gray-400 mb-3 uppercase tracking-wider">Podział wydatków</h2>
+                        <div class="relative h-48 flex justify-center items-center">
+                            <canvas id="expenseChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Subskrypcje szybki wgląd -->
+                    <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow space-y-2">
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider"><i class="fa-solid fa-rotate-right text-sky-400 mr-1"></i> Subskrypcje w tym miesiącu</h2>
+                            <button onclick="switchTab('subscriptions', false)" class="text-xs text-sky-400 hover:underline">Zarządzaj</button>
+                        </div>
+                        <div id="quickSubscriptionsList" class="space-y-1.5 text-xs"></div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Moduł stanu długów/rozliczenia -->
-            <div id="quickDebtWidget" class="bg-gradient-to-r from-amber-950/40 to-gray-900 border border-amber-500/30 p-3.5 rounded-2xl shadow flex justify-between items-center">
-                <div>
-                    <span class="text-[11px] text-amber-400 font-semibold block uppercase tracking-wider"><i class="fa-solid fa-scale-balanced mr-1"></i> Wzajemne rozliczenie</span>
-                    <span id="quickDebtText" class="text-sm font-bold text-gray-200 mt-0.5 block">Jesteście rozliczeni (0.00 zł)</span>
-                </div>
-                <button onclick="switchTab('debts', false)" class="text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1.5 rounded-xl hover:bg-amber-500/30 transition font-medium">
-                    Szczegóły
-                </button>
-            </div>
-
-            <!-- Podsumowanie miesiąca -->
-            <div class="grid grid-cols-2 gap-3">
-                <div class="bg-gray-900 border border-gray-800 p-3 rounded-xl">
-                    <span class="text-[11px] text-gray-400 block"><i class="fa-solid fa-arrow-trend-up text-emerald-500 mr-1"></i> Przychody razem</span>
-                    <span id="totalIncome" class="text-sm font-bold text-emerald-400 mt-0.5 block">0,00 zł</span>
-                </div>
-                <div class="bg-gray-900 border border-gray-800 p-3 rounded-xl">
-                    <span class="text-[11px] text-gray-400 block"><i class="fa-solid fa-arrow-trend-down text-rose-500 mr-1"></i> Wydatki razem</span>
-                    <span id="totalExpense" class="text-sm font-bold text-rose-400 mt-0.5 block">0,00 zł</span>
-                </div>
-            </div>
-
-            <!-- Przycisk dodawania transakcji -->
-            <button onclick="openModal()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 px-4 rounded-2xl transition shadow-lg shadow-emerald-900/20 flex items-center justify-center gap-2">
-                <i class="fa-solid fa-plus"></i> Dodaj transakcję
-            </button>
-
-            <!-- Szybki stan subskrypcji -->
-            <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow space-y-2">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider"><i class="fa-solid fa-rotate-right text-sky-400 mr-1"></i> Subskrypcje w tym miesiącu</h2>
-                    <button onclick="switchTab('subscriptions', false)" class="text-xs text-sky-400 hover:underline">Zarządzaj</button>
-                </div>
-                <div id="quickSubscriptionsList" class="space-y-1.5 text-xs"></div>
-            </div>
-
-            <!-- Wykres -->
-            <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow">
-                <h2 class="text-xs font-semibold text-gray-400 mb-3 uppercase tracking-wider">Podział wydatków</h2>
-                <div class="relative h-48 flex justify-center items-center">
-                    <canvas id="expenseChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Lista transakcji z filtrowaniem -->
+            <!-- Lista transakcji -->
             <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow space-y-3">
                 <div class="flex justify-between items-center">
                     <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Ostatnie wpisy</h2>
@@ -192,47 +200,19 @@
                         <option value="Wspólne">Wspólne</option>
                     </select>
                 </div>
-                <div id="transactionList" class="space-y-2.5 max-h-72 overflow-y-auto pr-1"></div>
+                <div id="transactionList" class="space-y-2.5 max-h-96 overflow-y-auto pr-1"></div>
             </div>
         </div>
 
-        <!-- WIDOK: HARMONOGRAM SPŁAT I OPŁAT -->
+        <!-- WIDOK: HARMONOGRAM SPŁAT -->
         <div id="tab-schedule" class="space-y-4 hidden">
-            <div class="bg-indigo-950/50 border border-indigo-500/30 p-4 rounded-2xl shadow space-y-3">
-                <div id="notifBanner" class="flex justify-between items-center border-b border-indigo-500/20 pb-3">
-                    <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-bell text-indigo-400 text-lg"></i>
-                        <div>
-                            <span class="text-xs font-bold block text-indigo-200">Powiadomienia w telefonie</span>
-                            <span class="text-[10px] text-gray-400">Otrzymuj przypomnienia na telefon</span>
-                        </div>
-                    </div>
-                    <button onclick="requestNotificationPermission()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium px-3 py-1.5 rounded-xl transition">
-                        Włącz
-                    </button>
-                </div>
-
-                <div class="flex justify-between items-center pt-1">
-                    <label for="notifTiming" class="text-xs font-medium text-gray-300 flex items-center gap-1.5">
-                        <i class="fa-solid fa-clock text-indigo-400"></i> Kiedy przypominać?
-                    </label>
-                    <select id="notifTiming" onchange="saveNotificationTiming()" class="bg-gray-900 border border-indigo-500/30 text-indigo-200 text-xs rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-indigo-400">
-                        <option value="0">W dniu płatności</option>
-                        <option value="1">1 dzień wcześniej</option>
-                        <option value="3">3 dni wcześniej</option>
-                        <option value="7">7 dni wcześniej</option>
-                    </select>
-                </div>
-            </div>
-
             <div class="flex justify-between items-center">
                 <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Nadchodzące opłaty i raty</h2>
                 <button onclick="openScheduleModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 shadow">
                     <i class="fa-solid fa-plus"></i> Dodaj płatność
                 </button>
             </div>
-
-            <div id="scheduleList" class="space-y-3"></div>
+            <div id="scheduleList" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
         </div>
 
         <!-- WIDOK: ROZLICZENIA I DŁUGI -->
@@ -243,7 +223,7 @@
                 <p id="debtDetailSub" class="text-xs text-gray-400">Jesteście całkowicie rozliczeni!</p>
                 
                 <div class="flex gap-2 justify-center pt-1">
-                    <button onclick="openPayDebtModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-xl transition shadow shadow-emerald-900/30 flex items-center gap-1.5">
+                    <button onclick="openPayDebtModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-xl transition shadow flex items-center gap-1.5">
                         <i class="fa-solid fa-money-bill-transfer"></i> Rozlicz dług (Wpisz spłatę)
                     </button>
                     <button onclick="clearDebts()" class="bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-medium px-3 py-2 rounded-xl transition border border-gray-700">
@@ -254,7 +234,7 @@
 
             <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow">
                 <h2 class="text-xs font-semibold text-amber-400 mb-3 uppercase tracking-wider">Historia długów i spłat</h2>
-                <div id="debtTransactionList" class="space-y-2.5 max-h-80 overflow-y-auto pr-1"></div>
+                <div id="debtTransactionList" class="space-y-2.5 max-h-96 overflow-y-auto pr-1"></div>
             </div>
         </div>
 
@@ -272,27 +252,27 @@
 
             <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow">
                 <h2 class="text-xs font-semibold text-pink-400 mb-3 uppercase tracking-wider">Prywatne transakcje Agi</h2>
-                <div id="gfTransactionList" class="space-y-2.5 max-h-80 overflow-y-auto pr-1"></div>
+                <div id="gfTransactionList" class="space-y-2.5 max-h-96 overflow-y-auto pr-1"></div>
             </div>
         </div>
 
-        <!-- WIDOK: SUBSKRYPCJE I OPŁATY STAŁE -->
+        <!-- WIDOK: SUBSKRYPCJE -->
         <div id="tab-subscriptions" class="space-y-4 hidden">
             <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow space-y-3">
                 <div class="flex justify-between items-center">
                     <div>
                         <h2 class="text-sm font-bold text-gray-200">Stałe Subskrypcje</h2>
-                        <p class="text-xs text-gray-400">Netflix, Spotify, Siłownia, Opłaty</p>
+                        <p class="text-xs text-gray-400">Netflix, Spotify, Siłownia</p>
                     </div>
                     <button onclick="openSubModal()" class="text-xs bg-sky-500/20 text-sky-400 border border-sky-500/30 px-3 py-1.5 rounded-xl hover:bg-sky-500/30 transition">
                         <i class="fa-solid fa-plus mr-1"></i> Dodaj
                     </button>
                 </div>
-                <div id="subscriptionsList" class="space-y-2.5 mt-3"></div>
+                <div id="subscriptionsList" class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3"></div>
             </div>
         </div>
 
-        <!-- WIDOK: PLANOWANE WYDATKI (PLANNER) -->
+        <!-- WIDOK: PLANOWANE WYDATKI -->
         <div id="tab-planner" class="space-y-4 hidden">
             <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow space-y-3">
                 <div class="flex justify-between items-center">
@@ -304,11 +284,11 @@
                         <i class="fa-solid fa-sliders mr-1"></i> Ustaw limit
                     </button>
                 </div>
-                <div id="plannerList" class="space-y-3 mt-3"></div>
+                <div id="plannerList" class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3"></div>
             </div>
         </div>
 
-        <!-- WIDOK: KREDYTY I RATY -->
+        <!-- WIDOK: KREDYTY -->
         <div id="tab-loans" class="space-y-4 hidden">
             <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow">
                 <div class="flex justify-between items-center mb-3">
@@ -317,7 +297,7 @@
                         <i class="fa-solid fa-plus mr-1"></i> Dodaj kredyt
                     </button>
                 </div>
-                <div id="loansList" class="space-y-3 mt-3"></div>
+                <div id="loansList" class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3"></div>
             </div>
         </div>
 
@@ -330,16 +310,16 @@
 
             <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow">
                 <h2 class="text-xs font-semibold text-gray-400 mb-3 uppercase tracking-wider">Oszczędności w tym miesiącu</h2>
-                <div id="savingsList" class="space-y-2.5 max-h-80 overflow-y-auto pr-1"></div>
+                <div id="savingsList" class="space-y-2.5 max-h-96 overflow-y-auto pr-1"></div>
             </div>
         </div>
 
     </main>
 
     <!-- MODALE -->
-    <!-- MODAL: Harmonogram Spłat -->
-    <div id="scheduleModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+    <!-- MODAL: Harmonogram -->
+    <div id="scheduleModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-2xl p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
                 <h3 class="font-bold text-base text-indigo-400"><i class="fa-solid fa-calendar-plus mr-1"></i> Dodaj opłatę do harmonogramu</h3>
                 <button onclick="closeScheduleModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -357,24 +337,24 @@
                 </div>
 
                 <div>
-                    <label class="text-xs text-gray-400 block mb-1">Nazwa płatności / Rachunku</label>
-                    <input type="text" id="schTitle" required placeholder="np. Czynsz, Rata TV" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
+                    <label class="text-xs text-gray-400 block mb-1">Nazwa płatności</label>
+                    <input type="text" id="schTitle" required placeholder="np. Czynsz" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">Kwota (zł)</label>
-                        <input type="number" step="0.01" id="schAmount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
+                        <input type="number" step="0.01" id="schAmount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
                     </div>
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">Termin płatności</label>
-                        <input type="date" id="schDueDate" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none text-white">
+                        <input type="date" id="schDueDate" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-2.5 py-1.5 text-xs text-white">
                     </div>
                 </div>
 
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Sposób zapłaty</label>
-                    <select id="schMethod" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs focus:outline-none text-white">
+                    <select id="schMethod" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white">
                         <option value="Przelew bankowy">Przelew bankowy</option>
                         <option value="Aplikacja banku">Aplikacja banku</option>
                         <option value="BLIK">BLIK</option>
@@ -384,18 +364,18 @@
 
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Numer konta / IBAN (opcjonalnie)</label>
-                    <input type="text" id="schIban" placeholder="00 0000 0000 0000 0000 0000 0000" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs focus:outline-none text-white">
+                    <input type="text" id="schIban" placeholder="00 0000..." class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white">
                 </div>
 
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Odbiorca / Uwagi</label>
-                    <input type="text" id="schRecipient" placeholder="np. Spółdzielnia" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs focus:outline-none text-white">
+                    <input type="text" id="schRecipient" placeholder="np. Spółdzielnia" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white">
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">Z jakiego konta?</label>
-                        <select id="schAccount" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs focus:outline-none text-white">
+                        <select id="schAccount" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white">
                             <option value="Wspólne">Konto Wspólne</option>
                             <option value="Szymon">Szymon</option>
                             <option value="Aga">Aga</option>
@@ -403,21 +383,21 @@
                     </div>
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">Powtarzalność</label>
-                        <select id="schRepeat" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs focus:outline-none text-white">
+                        <select id="schRepeat" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white">
                             <option value="Co miesiąc">Co miesiąc</option>
                             <option value="Jednorazowo">Jednorazowo</option>
                         </select>
                     </div>
                 </div>
 
-                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow-lg shadow-indigo-900/20">Zapisz płatność</button>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow">Zapisz płatność</button>
             </form>
         </div>
     </div>
 
     <!-- MODAL: Transakcja -->
-    <div id="transactionModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+    <div id="transactionModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-2xl p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
                 <h3 id="modalTxTitle" class="font-bold text-base">Nowa transakcja</h3>
                 <button onclick="closeModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -437,7 +417,7 @@
 
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Za kogo jest ten wydatek? (Dług)</label>
-                    <select id="debtType" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs focus:outline-none text-amber-300">
+                    <select id="debtType" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-amber-300">
                         <option value="NONE">Za siebie (Zwykły wydatek)</option>
                         <option value="SZYMON_FOR_AGA">Szymon płacił ZA AGĘ (Aga wisi Szymonowi)</option>
                         <option value="AGA_FOR_SZYMON">Aga płaciła ZA SZYMONA (Szymon wisi Adze)</option>
@@ -455,23 +435,23 @@
                     </div>
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">Data transakcji</label>
-                        <input type="date" id="txDate" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none text-white">
+                        <input type="date" id="txDate" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-2.5 py-1.5 text-xs text-white">
                     </div>
                 </div>
 
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Nazwa</label>
-                    <input type="text" id="title" required placeholder="np. Biedronka, Paliwo" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
+                    <input type="text" id="title" required placeholder="np. Biedronka, Paliwo" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
                 </div>
 
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Kwota (zł)</label>
-                    <input type="number" step="0.01" id="amount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
+                    <input type="number" step="0.01" id="amount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
                 </div>
 
                 <div id="categoryContainer">
                     <label class="text-xs text-gray-400 block mb-1">Kategoria</label>
-                    <select id="category" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
+                    <select id="category" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
                         <option value="Jedzenie">Jedzenie i Zakupy</option>
                         <option value="Mieszkanie">Mieszkanie / Rachunki</option>
                         <option value="Subskrypcje">Subskrypcje / Rozrywka</option>
@@ -483,14 +463,14 @@
                     </select>
                 </div>
 
-                <button type="submit" id="saveTxBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow-lg shadow-emerald-900/20">Zapisz</button>
+                <button type="submit" id="saveTxBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow">Zapisz</button>
             </form>
         </div>
     </div>
 
     <!-- MODAL: Przelew -->
-    <div id="transferModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4 shadow-2xl">
+    <div id="transferModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-2xl p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
                 <h3 class="font-bold text-base text-violet-400"><i class="fa-solid fa-vault mr-1"></i> Przelew na Konto Wspólne</h3>
                 <button onclick="closeTransferModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -499,7 +479,7 @@
             <form id="transferForm" onsubmit="registerSharedTransfer(event)" class="space-y-3">
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Nadawca</label>
-                    <select id="transferFrom" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs focus:outline-none text-white">
+                    <select id="transferFrom" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white">
                         <option value="Szymon">Szymon ➔ Konto Wspólne</option>
                         <option value="Aga">Aga ➔ Konto Wspólne</option>
                     </select>
@@ -507,22 +487,22 @@
 
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Kwota (zł)</label>
-                    <input type="number" step="0.01" id="transferAmount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
+                    <input type="number" step="0.01" id="transferAmount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
                 </div>
 
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Tytuł przelewu</label>
-                    <input type="text" id="transferTitle" required value="Zasilenie konta wspólnego" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
+                    <input type="text" id="transferTitle" required value="Zasilenie konta wspólnego" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
                 </div>
 
-                <button type="submit" class="w-full bg-violet-600 hover:bg-violet-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow-lg shadow-violet-900/20">Wykonaj przelew</button>
+                <button type="submit" class="w-full bg-violet-600 hover:bg-violet-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow">Wykonaj przelew</button>
             </form>
         </div>
     </div>
 
     <!-- MODAL: Spłata Długu -->
-    <div id="payDebtModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4 shadow-2xl">
+    <div id="payDebtModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-2xl p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
                 <h3 class="font-bold text-base text-emerald-400"><i class="fa-solid fa-money-bill-transfer mr-1"></i> Rejestracja spłaty długu</h3>
                 <button onclick="closePayDebtModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -531,7 +511,7 @@
             <form id="payDebtForm" onsubmit="registerDebtPayment(event)" class="space-y-3">
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Kierunek spłaty</label>
-                    <select id="payDirection" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs focus:outline-none text-white">
+                    <select id="payDirection" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white">
                         <option value="AGA_PAYS_SZYMON">Aga oddaje pieniądze Szymonowi (Aga ➔ Szymon)</option>
                         <option value="SZYMON_PAYS_AGA">Szymon oddaje pieniądze Adze (Szymon ➔ Aga)</option>
                     </select>
@@ -539,22 +519,22 @@
 
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Kwota (zł)</label>
-                    <input type="number" step="0.01" id="payAmount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
+                    <input type="number" step="0.01" id="payAmount" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
                 </div>
 
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Opis</label>
-                    <input type="text" id="payTitle" required value="Spłata długu / Rozliczenie" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
+                    <input type="text" id="payTitle" required value="Spłata długu / Rozliczenie" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
                 </div>
 
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow-lg shadow-emerald-900/20">Zarejestruj spłatę</button>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow">Zarejestruj spłatę</button>
             </form>
         </div>
     </div>
 
     <!-- MODAL: Subskrypcja -->
-    <div id="subModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4 shadow-2xl">
+    <div id="subModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-2xl p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
                 <h3 class="font-bold text-base">Nowa subskrypcja</h3>
                 <button onclick="closeSubModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -563,17 +543,17 @@
             <form id="subForm" onsubmit="addSubscription(event)" class="space-y-3">
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Nazwa</label>
-                    <input type="text" id="subName" required placeholder="Netflix" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
+                    <input type="text" id="subName" required placeholder="Netflix" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">Kwota miesięczna (zł)</label>
-                        <input type="number" step="0.01" id="subAmount" required placeholder="43.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
+                        <input type="number" step="0.01" id="subAmount" required placeholder="43.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
                     </div>
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">Konto</label>
-                        <select id="subAccount" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
+                        <select id="subAccount" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
                             <option value="Szymon">Szymon</option>
                             <option value="Aga">Aga</option>
                             <option value="Wspólne">Wspólne</option>
@@ -581,14 +561,14 @@
                     </div>
                 </div>
 
-                <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow-lg shadow-sky-900/20">Dodaj subskrypcję</button>
+                <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow">Dodaj subskrypcję</button>
             </form>
         </div>
     </div>
 
     <!-- MODAL: Planner -->
-    <div id="plannerModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4 shadow-2xl">
+    <div id="plannerModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-2xl p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
                 <h3 class="font-bold text-base">Ustaw limit wydatków</h3>
                 <button onclick="closeBudgetPlanModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -597,7 +577,7 @@
             <form id="plannerForm" onsubmit="saveBudgetPlan(event)" class="space-y-3">
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Kategoria</label>
-                    <select id="planCategory" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
+                    <select id="planCategory" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
                         <option value="Jedzenie">Jedzenie i Zakupy</option>
                         <option value="Mieszkanie">Mieszkanie / Rachunki</option>
                         <option value="Auto">Auto / Transport</option>
@@ -609,17 +589,17 @@
 
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Maksymalny planowany limit (zł)</label>
-                    <input type="number" step="0.01" id="planLimit" required placeholder="1500.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
+                    <input type="number" step="0.01" id="planLimit" required placeholder="1500.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
                 </div>
 
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow-lg shadow-emerald-900/20">Zapisz limit</button>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow">Zapisz limit</button>
             </form>
         </div>
     </div>
 
     <!-- MODAL: Kredyt -->
-    <div id="loanModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4 shadow-2xl">
+    <div id="loanModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-gray-900 border border-gray-800 w-full max-w-md rounded-2xl p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
                 <h3 class="font-bold text-base">Dodaj stały kredyt / ratę</h3>
                 <button onclick="closeLoanModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -628,26 +608,26 @@
             <form id="loanForm" onsubmit="addLoan(event)" class="space-y-3">
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Nazwa kredytu / raty</label>
-                    <input type="text" id="loanName" required placeholder="np. Rata za auto" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
+                    <input type="text" id="loanName" required placeholder="np. Rata za auto" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">Miesięczna rata (zł)</label>
-                        <input type="number" step="0.01" id="loanMonthly" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
+                        <input type="number" step="0.01" id="loanMonthly" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
                     </div>
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">Suma do spłaty (zł)</label>
-                        <input type="number" step="0.01" id="loanTotal" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
+                        <input type="number" step="0.01" id="loanTotal" required placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
                     </div>
                 </div>
 
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Dzień płatności w miesiącu</label>
-                    <input type="number" min="1" max="31" id="loanDay" required placeholder="10" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-white">
+                    <input type="number" min="1" max="31" id="loanDay" required placeholder="10" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
                 </div>
 
-                <button type="submit" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow-lg shadow-amber-900/20">Dodaj kredyt</button>
+                <button type="submit" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-medium py-3 rounded-xl transition mt-2 shadow">Dodaj kredyt</button>
             </form>
         </div>
     </div>
@@ -673,20 +653,10 @@
             scheduleItems = JSON.parse(localStorage.getItem('budget_schedule')) || [];
             budgetPlans = JSON.parse(localStorage.getItem('budget_plans')) || {};
 
-            const savedTiming = localStorage.getItem('budget_notif_timing') || "0";
-            const timingSelect = document.getElementById('notifTiming');
-            if (timingSelect) timingSelect.value = savedTiming;
-
             const monthInput = document.getElementById('currentMonth');
             const now = new Date();
             monthInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
             monthInput.addEventListener('change', updateApp);
-
-            if ("Notification" in window && Notification.permission === "granted") {
-                const banner = document.getElementById('notifBanner');
-                if (banner) banner.style.display = 'none';
-                checkNotificationAlerts();
-            }
 
             document.getElementById('title').addEventListener('input', function(e) {
                 const val = e.target.value.toLowerCase();
@@ -721,45 +691,6 @@
             if (dateEl) {
                 dateEl.innerHTML = `<i class="fa-regular fa-calendar text-[9px]"></i> Dzisiaj: ${formatted}`;
             }
-        }
-
-        function saveNotificationTiming() {
-            const val = document.getElementById('notifTiming').value;
-            localStorage.setItem('budget_notif_timing', val);
-            checkNotificationAlerts();
-        }
-
-        function requestNotificationPermission() {
-            if (!("Notification" in window)) {
-                alert("Twoja przeglądarka nie obsługuje powiadomień.");
-                return;
-            }
-            Notification.requestPermission().then(permission => {
-                if (permission === "granted") {
-                    const banner = document.getElementById('notifBanner');
-                    if (banner) banner.style.display = 'none';
-                    new Notification("Budżet Domowy", { body: "Powiadomienia o płatnościach zostały włączone!" });
-                    checkNotificationAlerts();
-                }
-            });
-        }
-
-        function checkNotificationAlerts() {
-            if (!("Notification" in window) || Notification.permission !== "granted") return;
-
-            const daysBefore = parseInt(localStorage.getItem('budget_notif_timing') || "0");
-            const targetDate = new Date();
-            targetDate.setDate(targetDate.getDate() + daysBefore);
-            const targetDateStr = targetDate.toISOString().split('T')[0];
-
-            scheduleItems.forEach(item => {
-                if (item.dueDate === targetDateStr && !item.paid) {
-                    let timingText = daysBefore === 0 ? "dzisiaj" : (daysBefore === 1 ? "jutro" : `za ${daysBefore} dni`);
-                    new Notification("Przypomnienie o płatności!", {
-                        body: `Płatność ${item.title} (${item.amount.toFixed(2)} zł) mija ${timingText}!`
-                    });
-                }
-            });
         }
 
         function toggleSidebar() {
@@ -1231,7 +1162,6 @@
         }
 
         function updateApp() {
-            // Ponowne odczytanie pamięci na wypadek odświeżenia
             transactions = JSON.parse(localStorage.getItem('budget_transactions')) || [];
             loans = JSON.parse(localStorage.getItem('budget_loans')) || [];
             subscriptions = JSON.parse(localStorage.getItem('budget_subscriptions')) || [];
@@ -1414,7 +1344,7 @@
             }
 
             if (scheduleItems.length === 0) {
-                schEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-6">Brak płatności w harmonogramie</p>';
+                schEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-6 col-span-full">Brak płatności w harmonogramie</p>';
                 return;
             }
 
@@ -1424,8 +1354,8 @@
 
                 let statusBadge = `<span class="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-lg">Termin: ${item.dueDate}</span>`;
                 if (item.paid) statusBadge = `<span class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-lg"><i class="fa-solid fa-check mr-1"></i>Opłacone</span>`;
-                else if (isOverdue) statusBadge = `<span class="text-[10px] bg-rose-500/20 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded-lg font-bold"><i class="fa-solid fa-exclamation-triangle mr-1"></i>Zaległe (${item.dueDate})</span>`;
-                else if (isToday) statusBadge = `<span class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-lg font-bold"><i class="fa-solid fa-clock mr-1"></i>Płatne Dzisiaj!</span>`;
+                else if (isOverdue) statusBadge = `<span class="text-[10px] bg-rose-500/20 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded-lg font-bold"><i class="fa-solid fa-exclamation-triangle mr-1"></i>Zaległe</span>`;
+                else if (isToday) statusBadge = `<span class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-lg font-bold"><i class="fa-solid fa-clock mr-1"></i>Dzisiaj!</span>`;
 
                 schEl.insertAdjacentHTML('beforeend', `
                     <div class="bg-gray-900 border ${isOverdue ? 'border-rose-500/50' : 'border-gray-800'} p-3.5 rounded-2xl space-y-2.5">
@@ -1440,20 +1370,18 @@
                             <button onclick="deleteScheduleItem(${item.id})" class="text-gray-600 hover:text-rose-400 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
                         </div>
                         <div class="bg-gray-950/60 p-2.5 rounded-xl text-xs space-y-1 text-gray-400">
-                            <div class="flex justify-between"><span>Forma płatności:</span> <strong class="text-gray-300">${item.method}</strong></div>
-                            ${item.recipient ? `<div class="flex justify-between"><span>Odbiorca / Tytuł:</span> <strong class="text-gray-300">${item.recipient}</strong></div>` : ''}
+                            <div class="flex justify-between"><span>Forma:</span> <strong class="text-gray-300">${item.method}</strong></div>
+                            ${item.recipient ? `<div class="flex justify-between"><span>Odbiorca:</span> <strong class="text-gray-300">${item.recipient}</strong></div>` : ''}
                             ${item.iban ? `
                                 <div class="flex justify-between items-center pt-1 border-t border-gray-800 mt-1">
-                                    <span class="truncate max-w-[200px] font-mono text-[11px] text-gray-300">${item.iban}</span>
-                                    <button onclick="copyIban('${item.iban}')" class="text-[10px] bg-gray-800 hover:bg-gray-700 text-indigo-300 border border-gray-700 px-2 py-0.5 rounded-lg flex items-center gap-1">
-                                        <i class="fa-regular fa-copy"></i> Kopiuj IBAN
-                                    </button>
+                                    <span class="truncate max-w-[150px] font-mono text-[11px] text-gray-300">${item.iban}</span>
+                                    <button onclick="copyIban('${item.iban}')" class="text-[10px] bg-gray-800 hover:bg-gray-700 text-indigo-300 px-2 py-0.5 rounded-lg">Kopiuj</button>
                                 </div>
                             ` : ''}
                         </div>
                         ${!item.paid ? `
-                            <button onclick="payScheduleItem(${item.id})" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs py-2 rounded-xl transition flex items-center justify-center gap-1.5 shadow">
-                                <i class="fa-solid fa-check"></i> Oznacz jako zapłacone
+                            <button onclick="payScheduleItem(${item.id})" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs py-2 rounded-xl transition shadow flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-check"></i> Opłacone
                             </button>
                         ` : ''}
                     </div>
@@ -1468,17 +1396,16 @@
             quickListEl.innerHTML = '';
 
             if (subscriptions.length === 0) {
-                listEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Brak zdefiniowanych subskrypcji</p>';
-                quickListEl.innerHTML = '<p class="text-xs text-gray-500">Brak zdefiniowanych subskrypcji</p>';
+                listEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4 col-span-full">Brak zdefiniowanych subskrypcji</p>';
+                quickListEl.innerHTML = '<p class="text-xs text-gray-500">Brak subskrypcji</p>';
                 return;
             }
 
             subscriptions.forEach(sub => {
                 const paidThisMonth = currentMonthTx.some(t => t.title === `Subskrypcja: ${sub.name}`);
-
                 const statusBadge = paidThisMonth 
                     ? '<span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-md"><i class="fa-solid fa-check mr-1"></i>Opłacone</span>'
-                    : `<button onclick="paySubscription(${sub.id})" class="text-[10px] bg-sky-500/20 text-sky-400 hover:bg-sky-500/30 border border-sky-500/30 px-2 py-1 rounded-md transition"><i class="fa-solid fa-plus mr-1"></i>Dodaj do tego miesiąca</button>`;
+                    : `<button onclick="paySubscription(${sub.id})" class="text-[10px] bg-sky-500/20 text-sky-400 px-2 py-1 rounded-md">Dodaj</button>`;
 
                 listEl.insertAdjacentHTML('beforeend', `
                     <div class="flex justify-between items-center bg-gray-950/60 border border-gray-800 p-3 rounded-xl">
@@ -1499,9 +1426,7 @@
                 quickListEl.insertAdjacentHTML('beforeend', `
                     <div class="flex justify-between items-center py-1 border-b border-gray-800/50 last:border-0">
                         <span class="text-gray-300">${sub.name} (${sub.amount.toFixed(2)} zł)</span>
-                        ${paidThisMonth 
-                            ? '<span class="text-emerald-400 font-medium"><i class="fa-solid fa-check"></i></span>'
-                            : `<button onclick="paySubscription(${sub.id})" class="text-sky-400 hover:underline">Dodaj</button>`}
+                        ${paidThisMonth ? '<span class="text-emerald-400"><i class="fa-solid fa-check"></i></span>' : `<button onclick="paySubscription(${sub.id})" class="text-sky-400 hover:underline">Dodaj</button>`}
                     </div>
                 `);
             });
@@ -1515,28 +1440,18 @@
                 const limit = budgetPlans[cat] || 0;
                 const spent = categories[cat] || 0;
                 const percent = limit > 0 ? Math.min(100, Math.round((spent / limit) * 100)) : 0;
-
-                let barColor = 'bg-emerald-500';
-                if (percent > 80) barColor = 'bg-amber-500';
-                if (percent >= 100) barColor = 'bg-rose-500';
+                let barColor = percent > 80 ? (percent >= 100 ? 'bg-rose-500' : 'bg-amber-500') : 'bg-emerald-500';
 
                 listEl.insertAdjacentHTML('beforeend', `
                     <div class="bg-gray-950/60 border border-gray-800 p-3 rounded-xl space-y-1.5">
                         <div class="flex justify-between items-center text-xs">
                             <span class="font-semibold text-gray-200">${cat}</span>
-                            <span class="text-gray-400">
-                                Wydatek: <strong class="text-white">${spent.toFixed(2)} zł</strong> 
-                                ${limit > 0 ? `/ ${limit.toFixed(2)} zł` : '(Brak limitu)'}
-                            </span>
+                            <span class="text-gray-400">${spent.toFixed(2)} zł ${limit > 0 ? `/ ${limit.toFixed(2)} zł` : ''}</span>
                         </div>
                         ${limit > 0 ? `
                         <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
-                            <div class="${barColor} h-full rounded-full transition-all duration-300" style="width: ${percent}%"></div>
-                        </div>
-                        <div class="text-[10px] text-right ${percent >= 100 ? 'text-rose-400 font-bold' : 'text-gray-500'}">
-                            ${percent >= 100 ? 'Przekroczono limit!' : `Wykorzystano ${percent}% limitu`}
-                        </div>
-                        ` : ''}
+                            <div class="${barColor} h-full rounded-full transition-all" style="width: ${percent}%"></div>
+                        </div>` : ''}
                     </div>
                 `);
             });
@@ -1547,7 +1462,7 @@
             loansEl.innerHTML = '';
 
             if (loans.length === 0) {
-                loansEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Brak dodanych kredytów</p>';
+                loansEl.innerHTML = '<p class="text-xs text-gray-500 text-center py-4 col-span-full">Brak dodanych kredytów</p>';
                 return;
             }
 
@@ -1558,20 +1473,18 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <h3 class="font-bold text-sm text-gray-200">${loan.name}</h3>
-                                <span class="text-[11px] text-gray-400">Płatność do: ${loan.day} dnia miesiąca</span>
+                                <span class="text-[11px] text-gray-400">Płatność do: ${loan.day} dnia</span>
                             </div>
                             <button onclick="deleteLoan(${loan.id})" class="text-gray-500 hover:text-rose-400 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
                         </div>
                         <div class="flex justify-between items-center text-xs mt-1">
                             <span class="text-gray-400">Rata: <strong class="text-white">${loan.monthly.toFixed(2)} zł</strong></span>
-                            <span class="text-amber-400 font-semibold">${loan.paid.toFixed(2)} / ${loan.total.toFixed(2)} zł (${percent}%)</span>
+                            <span class="text-amber-400 font-semibold">${loan.paid.toFixed(2)} / ${loan.total.toFixed(2)} zł</span>
                         </div>
                         <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
-                            <div class="bg-amber-500 h-full rounded-full transition-all duration-300" style="width: ${percent}%"></div>
+                            <div class="bg-amber-500 h-full rounded-full" style="width: ${percent}%"></div>
                         </div>
-                        <button onclick="payLoan(${loan.id})" class="w-full mt-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 font-medium text-xs py-2 rounded-xl transition flex items-center justify-center gap-1.5">
-                            <i class="fa-solid fa-check"></i> Opłać ratę w tym miesiącu
-                        </button>
+                        <button onclick="payLoan(${loan.id})" class="w-full mt-1 bg-amber-500/10 text-amber-400 border border-amber-500/30 text-xs py-2 rounded-xl">Opłać ratę</button>
                     </div>
                 `);
             });
@@ -1583,21 +1496,7 @@
             const data = Object.values(categories);
 
             if (chartInstance) chartInstance.destroy();
-            if (labels.length === 0) {
-                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-                return;
-            }
-
-            const colorMap = {
-                'Kredyty / Raty': '#f59e0b',
-                'Oszczędności': '#38bdf8',
-                'Subskrypcje': '#0284c7',
-                'Jedzenie': '#10b981',
-                'Mieszkanie': '#3b82f6',
-                'Auto': '#ec4899',
-                'Zdrowie': '#a855f7',
-                'Inne': '#64748b'
-            };
+            if (labels.length === 0) return;
 
             chartInstance = new Chart(ctx, {
                 type: 'doughnut',
@@ -1605,7 +1504,7 @@
                     labels: labels,
                     datasets: [{
                         data: data,
-                        backgroundColor: labels.map(l => colorMap[l] || '#9ca3af'),
+                        backgroundColor: ['#10b981', '#3b82f6', '#0284c7', '#f59e0b', '#ec4899', '#a855f7', '#64748b'],
                         borderWidth: 0
                     }]
                 },
@@ -1613,10 +1512,7 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            position: 'right',
-                            labels: { color: '#9ca3af', boxWidth: 10, font: { size: 10 } }
-                        }
+                        legend: { position: 'right', labels: { color: '#9ca3af', boxWidth: 10, font: { size: 10 } } }
                     }
                 }
             });
